@@ -16,6 +16,18 @@ String  get finalFeeData => finalFee;
 String  get distanceData => distance;
 bool  get laData => la;
 
+String status ='0';
+
+
+
+String  get statusDate => status;
+
+
+statusUpdate(String st){
+  status=st;
+  notifyListeners();
+
+}
 
 void setIndex(int i){
   index=i;

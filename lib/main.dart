@@ -1,6 +1,8 @@
 import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
+import 'package:costumer/helpers/get_my_orders.dart';
 import 'package:costumer/pages/google_map.dart';
 import 'package:costumer/pages/models/db.dart';
+import 'package:costumer/pages/orderScreen.dart';
 import 'package:costumer/pages/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
@@ -87,33 +89,31 @@ class CheckPoint extends StatefulWidget {
 
 class _CheckPointState extends State<CheckPoint> {
   bool? signed;
-  @override
-  void initState() {
-    DBProvider.db.getMe().then(((value) {
-      if (value != 0) {
-        print(value);
-           Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => Home(value[0])),
-                      (Route<dynamic> route) => false,
-                    );
-        //   hasAccount(value[0]['phone']).then((info) {
-        //  if(info[0]==0){
-        //    print(value);
-        //    Get.to(AddDriver(value[0]['phone']));
-        //  }else{
-        //     Get.to(Home(info));
 
-        //  }
-        //   });
+  getInfo() {
+    DBProvider.db.getMe().then(((info) async {
+      if (info != 0) {
+     
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => Home(info[0])),
+            (Route<dynamic> route) => false,
+          );
+        }
+    
+    
 
-      } else {
+       else {
         setState(() {
           signed = true;
         });
       }
     }));
+  }
 
+  @override
+  void initState() {
+    getInfo();
     super.initState();
   }
 
@@ -239,18 +239,18 @@ class _SignUpState extends State<SignUp> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom:30.0),
-                child: Container(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30.0),
+              child: Container(
                 child: Image.asset('lib/assets/new.png'),
-            ),
               ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
                 width: MediaQuery.of(context).size.width / 1.3,
                 child: TextField(
-                      controller: name,
+                  controller: name,
                   decoration: InputDecoration(
                     labelText: context.watch<VehicleTypeController>().la
                         ? 'الإسم '
@@ -272,7 +272,7 @@ class _SignUpState extends State<SignUp> {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width / 1.3,
                 child: TextField(
-                      controller: email,
+                  controller: email,
                   decoration: InputDecoration(
                     labelText: context.watch<VehicleTypeController>().la
                         ? 'الإيميل '

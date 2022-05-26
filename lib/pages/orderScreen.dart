@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:community_material_icon/community_material_icon.dart';
+import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
+import 'package:costumer/helpers/show_cancel_buttomsheet.dart';
 import 'package:costumer/pages/models/get_polyline.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import '../main.dart';
 import 'models/retun_icon.dart';
 
@@ -21,14 +24,18 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
+  Map? orderInfo;
   check() {
     http
         .get(Uri.parse('${url}api/orders/${widget.orderInfo['id']}'),
             headers: header)
         .then((value) {
-      // setState(() {
-      //   list = jsonDecode(value.body);
-      // });
+      setState(() {
+        orderInfo = jsonDecode(value.body);
+      });
+      Provider.of<VehicleTypeController>(context, listen: false)
+          .statusUpdate(orderInfo!['status']);
+
       if (kDebugMode) {
         // print(jsonDecode(value.body));
       }
@@ -39,39 +46,54 @@ class _OrderScreenState extends State<OrderScreen> {
       // }
     });
   }
-  
-    Completer<GoogleMapController> _controller = Completer();
-   GoogleMapController? mapController;
+
+  Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController? mapController;
   Set<Polyline> polylines = {};
 
   setpolylines() {
     getPolyLine(
         LatLng(
-          double.parse(widget.orderInfo['start_late']),
-          double.parse(widget.orderInfo['start_longe']),
+          double.parse(orderInfo!['start_late']),
+          double.parse(orderInfo!['start_longe']),
         ),
         LatLng(
-          double.parse(widget.orderInfo['end_late']),
-          double.parse(widget.orderInfo['end_longe']),
+          double.parse(orderInfo!['end_late']),
+          double.parse(orderInfo!['end_longe']),
         )).then((value) {
-      setState(() {
-        polylines = value;
-        updateCameraLocation( LatLng(
-          double.parse(widget.orderInfo['start_late']),
-          double.parse(widget.orderInfo['start_longe']),
-        ),  LatLng(
-          double.parse(widget.orderInfo['end_late']),
-          double.parse(widget.orderInfo['end_longe']),
-        ),  mapController!);
-      });
+      if (mounted) {
+        setState(() {
+          polylines = value;
+          updateCameraLocation(
+              LatLng(
+                double.parse(orderInfo!['start_late']),
+                double.parse(orderInfo!['start_longe']),
+              ),
+              LatLng(
+                double.parse(orderInfo!['end_late']),
+                double.parse(orderInfo!['end_longe']),
+              ),
+              mapController!);
+        });
+      }
     });
   }
 
+  Timer? _checkingTimer;
   @override
   void initState() {
-    check();
-      setpolylines();
+    orderInfo = widget.orderInfo;
+    _checkingTimer = Timer.periodic(Duration(seconds: 20), (Timer t) {
+      check();
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _checkingTimer!.cancel();
+
+    super.dispose();
   }
 
   @override
@@ -87,8 +109,8 @@ class _OrderScreenState extends State<OrderScreen> {
               // },
               // markers: Set<Marker>.of(_markers.values),
               initialCameraPosition: CameraPosition(
-                target: LatLng(double.parse(widget.orderInfo['start_late']),
-                    double.parse(widget.orderInfo['start_longe'])),
+                target: LatLng(double.parse(orderInfo!['start_late']),
+                    double.parse(orderInfo!['start_longe'])),
                 zoom: 10.0,
               ),
               onMapCreated: _onMapCreated,
@@ -97,58 +119,49 @@ class _OrderScreenState extends State<OrderScreen> {
           //   padding: const EdgeInsets.all(20.0),
           //   child: Text(widget.orderInfo.toString()),
           // ),
-    
-             Positioned(
+
+          Positioned(
               top: 50,
               left: 10,
               child: Container(
-               decoration: BoxDecoration(
-                 borderRadius: BorderRadius.circular(10),
-                 color: Colors.white.withOpacity(.5),
-                 // boxShadow: [
-                 //   BoxShadow(color: Colors.white, spreadRadius: 1),
-                 // ],
-               ),
-               width: MediaQuery.of(context).size.width - 20,
-               // height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white.withOpacity(.5),
+                  // boxShadow: [
+                  //   BoxShadow(color: Colors.white, spreadRadius: 1),
+                  // ],
+                ),
+                width: MediaQuery.of(context).size.width - 20,
+                // height: 50,
 
-               child: Padding(
-                 padding: const EdgeInsets.all(8.0),
-                 child: Row(
-                   children: [
-                    GestureDetector(
-                      onTap:() => Get.back(),
-                      child: Icon(CupertinoIcons.back)),
-                
-                   Expanded(
-                         // flex: 5,
-                       child: Padding(
-                         padding: const EdgeInsets.only(left: 8.0),
-                         child: Container(
-                           child: FittedBox(
-                             fit: BoxFit.scaleDown,
-                             child: Text(widget.orderInfo['distance']
-                               
-                                       ,
-                               // style: Theme.of(context).textTheme.headline6,
-                             ),
-                           ),
-                         ),
-                       ),
-                      
-                     ),
-                  
-                    GestureDetector(
-                      onTap:() => Get.back(),
-                      child: Icon(Icons.cancel_rounded,color: Colors.pink.shade200,)),
-                
-                   ],
-                 ),
-               ),
-                ))
-       
-       ,
-             Positioned(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      statusIcon(context.watch<VehicleTypeController>().status),
+                      Expanded(
+                        // flex: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Container(),
+                        ),
+                      ),
+                      Visibility(visible:   orderInfo!['status'] !='11',
+                        child: GestureDetector(
+                            onTap: () {
+                              showCancelBottomSheet(context, orderInfo!['id']);
+                            },
+                            child: Icon(
+                              Icons.cancel_rounded,
+                              color: Colors.pink.shade200,
+                            )),
+                      ),
+                    ],
+                  ),
+                ),
+              )),
+
+          Positioned(
             bottom: 0,
             left: 5,
             child: Container(
@@ -168,12 +181,36 @@ class _OrderScreenState extends State<OrderScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Container(
                     child: ListView(
-                       padding: EdgeInsets.only(top:5),
+                  padding: EdgeInsets.only(top: 5),
                   children: [
+                    Visibility(
+                      visible: orderInfo!['provider_name'] != null,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            orderInfo!['provider_name'] ?? '',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.headline6,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            orderInfo!['provider_phone'] ?? '',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.headline6,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
                     Row(
                       children: [
-                         Icon(
-                          Icons.trip_origin,color: Colors.pink.shade200,
+                        Icon(
+                          Icons.trip_origin,
+                          color: Colors.pink.shade200,
                           size: 15,
                         ),
                         SizedBox(
@@ -192,18 +229,18 @@ class _OrderScreenState extends State<OrderScreen> {
                     FittedBox(
                         fit: BoxFit.contain,
                         child: Text(
-                          widget.orderInfo['start_address'],
+                          orderInfo!['start_address'],
                           overflow: TextOverflow.ellipsis,
                         )),
                     SizedBox(
                       height: 20,
                     ),
-                    
                     Row(
                       //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Icon(
-                          CommunityMaterialIcons.map_marker,color: Colors.pink.shade200,
+                          CommunityMaterialIcons.map_marker,
+                          color: Colors.pink.shade200,
                           size: 15,
                         ),
                         SizedBox(
@@ -224,81 +261,74 @@ class _OrderScreenState extends State<OrderScreen> {
                       ],
                     ),
                     Text(
-                      widget.orderInfo['end_address'],
+                      orderInfo!['end_address'],
                       textAlign: TextAlign.start,
                       // style: Theme.of(context).textTheme.headline6,
                       overflow: TextOverflow.ellipsis,
                     ),
-                   SizedBox(
+                    SizedBox(
                       height: 20,
                     ),
                     Divider(),
-                   SizedBox(
+                    SizedBox(
                       height: 20,
                     ),
-                    
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                     statusIcon('0'),
-                      Text(
-                      widget.orderInfo['fee']+' SAR',
-                      textAlign: TextAlign.start,
-                      style: Theme.of(context).textTheme.headline6,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          orderInfo!['fee'] + ' SAR',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.headline6,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          orderInfo!['distance'] + ' KM',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.headline6,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-
-                  ],),
                   ],
                 )),
               ),
             ),
           ),
-         
-           
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(CupertinoIcons.location_north_line),
         onPressed: () {
-        
-
-            setState(() {
-                  updateCameraLocation( LatLng(
-          double.parse(widget.orderInfo['start_late']),
-          double.parse(widget.orderInfo['start_longe']),
-        ),  LatLng(
-          double.parse(widget.orderInfo['end_late']),
-          double.parse(widget.orderInfo['end_longe']),
-        ),  mapController!);
-            });
-      },),
+          setState(() {
+            updateCameraLocation(
+                LatLng(
+                  double.parse(orderInfo!['start_late']),
+                  double.parse(orderInfo!['start_longe']),
+                ),
+                LatLng(
+                  double.parse(orderInfo!['end_late']),
+                  double.parse(orderInfo!['end_longe']),
+                ),
+                mapController!);
+          });
+        },
+      ),
     );
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
   void _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
     _controller.complete(controller);
     final c = await _controller.future;
-
+    setpolylines();
   }
+
   Future<void> updateCameraLocation(
     LatLng source,
     LatLng destination,
     GoogleMapController mapController,
   ) async {
-
     if (mapController == null) return;
 
     LatLngBounds bounds;

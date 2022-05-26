@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:costumer/helpers/get_my_orders.dart';
 import 'package:costumer/pages/models/colculating_distans.dart';
 import 'package:costumer/pages/models/colculating_fee.dart';
 import 'package:costumer/pages/orderScreen.dart';
@@ -17,6 +18,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../controllers/Vehicle_tybe_controller.dart';
+import '../helpers/make_trip.dart';
 import '../main.dart';
 
 class Home extends StatefulWidget {
@@ -64,63 +66,12 @@ class _HomeState extends State<Home> {
     });
   }
 
-  makeTrip() {
-    try {
-      http.post(Uri.parse('${url}api/orders'), headers: header, body: {
-        'user_name': widget.info['name'],
-        'user_phone': widget.info['phone'],
-        'start_address':
-            Provider.of<VehicleTypeController>(context, listen: false)
-                .firstPoint[0],
-        'start_late': Provider.of<VehicleTypeController>(context, listen: false)
-            .firstPoint[1],
-        'start_longe':
-            Provider.of<VehicleTypeController>(context, listen: false)
-                .firstPoint[2],
-        'end_address':
-            Provider.of<VehicleTypeController>(context, listen: false)
-                .dropPoint[0],
-        'end_late': Provider.of<VehicleTypeController>(context, listen: false)
-            .dropPoint[1],
-        'end_longe': Provider.of<VehicleTypeController>(context, listen: false)
-            .dropPoint[2],
-        'fee':
-            Provider.of<VehicleTypeController>(context, listen: false).finalFee,
-        'car_type': choosenType['id'].toString(),
-        'distance': Provider.of<VehicleTypeController>(context, listen: false)
-            .distanceData,
-        'status': '0',
-      }).then((value) {
-        if ((value.statusCode == 200 || value.statusCode == 201) &&
-            Provider.of<VehicleTypeController>(context, listen: false)
-                    .firstPoint[1] ==
-                jsonDecode(value.body)['start_late']) {
-          if (kDebugMode) {
-            print(jsonDecode(value.body)['start_late']);
-          }
-          Map i = jsonDecode(value.body);
-          Get.to(OrderScreen(i));
-        } else {
-          if (kDebugMode) {
-            print('noooooo');
-          }
-        }
-        // for (var i in list) {
-        //   if (kDebugMode) {
-        //
-        //   }
-        // }
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
-  }
-
+ 
   var choosenType;
   @override
   void initState() {
+
+    getMyOreders(widget.info['phone'], context);
     getvehicle();
     
     super.initState();
@@ -201,7 +152,7 @@ class _HomeState extends State<Home> {
             context.watch<VehicleTypeController>().firstPoint.isNotEmpty,
         child: FloatingActionButton.extended(
           onPressed: () {
-            makeTrip();
+            makeTrip(context,widget.info,choosenType);
           },
           label: const Text('To the trip!'),
           icon: const Icon(Icons.delivery_dining),

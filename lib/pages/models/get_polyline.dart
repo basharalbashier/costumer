@@ -24,20 +24,20 @@ class NetworkHelper {
   final double endLng;
   final double endLat;
   Future getData() async {
-    http.Response response = await http.get(Uri.parse(
-        '$url$journeyMode?api_key=$apiKey&start=$startLng,$startLat&end=$endLng,$endLat'));
+    // http.Response response = await http.get(Uri.parse(
+    //     '$url$journeyMode?api_key=$apiKey&start=$startLng,$startLat&end=$endLng,$endLat'));
 
-    // print(
-    //     "$url$journeyMode?$apiKey&start=$startLng,$startLat&end=$endLng,$endLat");
-    if (response.statusCode == 200) {
-      String data = response.body;
-      print(data);
-      // print(jsonDecode(data)['features'][0]['properties']['summary']);
+    // // print(
+    // //     "$url$journeyMode?$apiKey&start=$startLng,$startLat&end=$endLng,$endLat");
+    // if (response.statusCode == 200) {
+    //   String data = response.body;
+    //   print(data);
+    //   // print(jsonDecode(data)['features'][0]['properties']['summary']);
 
-      return jsonDecode(data);
-    } else {
-      // print(response.statusCode);
-    }
+    //   return jsonDecode(data);
+    // } else {
+    //   // print(response.statusCode);
+    // }
   }
 }
 
@@ -61,13 +61,13 @@ class Linestring {
        print('im');
     try {
       // getdata() returns a json decoded data
-      var data = await network.getData();
+      // var data = await network.getData();
       // we can reach to our desired json data manually as following
-      Linestring ls =
-          Linestring(data['features'][0]['geometry']['coordinates']);
-      for (int i = 0; i < ls.linestring.length; i++) {
-        polypoints.add(LatLng(ls.linestring[i][1], ls.linestring[i][0]));
-      }
+      // Linestring ls =
+      //     Linestring(data['features'][0]['geometry']['coordinates']);
+      // for (int i = 0; i < ls.linestring.length; i++) {
+      //   polypoints.add(LatLng(ls.linestring[i][1], ls.linestring[i][0]));
+      // }
       // if (polypoints.length == ls.linestring.length) {
       //   setState(() {
       //     d = '${((double.parse('${data['features'][0]['properties']['summary']['distance']}') / 1000).toStringAsFixed(1))}/Km';
