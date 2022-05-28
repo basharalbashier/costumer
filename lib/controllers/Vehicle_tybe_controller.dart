@@ -4,7 +4,7 @@ class VehicleTypeController extends ChangeNotifier {
 int index =0;
 List<String> firstPoint=[];
 List<String> dropPoint=[];
-String finalFee='';
+String finalFee='0.00';
 String distance='';
 bool la=true;
 

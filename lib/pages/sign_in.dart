@@ -1,152 +1,153 @@
-import 'package:flutter/cupertino.dart';
+
+import 'package:costumer/helpers/replace_numbers.dart';
+import 'package:costumer/pages/check_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_verification_code/flutter_verification_code.dart';
+import 'package:provider/provider.dart';
+
+import '../controllers/Vehicle_tybe_controller.dart';
+import '../helpers/error_snack.dart';
+import '../helpers/gradiant_text.dart';
 
 
-import 'home.dart';
+import 'models/db.dart';
 
 class SignUp extends StatefulWidget {
-  SignUp({Key? key}) : super(key: key);
+  const SignUp({Key? key}) : super(key: key);
 
   @override
   State<SignUp> createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
-  bool la = false;
-  bool doneFilling = false;
-  bool val = true;
-  bool _onEditing = false;
-  String _code = '';
-
-  errono(a, e) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        dismissDirection: DismissDirection.horizontal,
-        backgroundColor: Colors.pink.withOpacity(0.0),
-        content: Container(
-          // color: Colors.green,
-          height: 50,
-          width: 150,
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(
-                  Icons.error,
-                  color: Colors.pink,
-                ),
-                Container(
-                  width: 20,
-                  height: 12,
-                ),
-                Text(
-                  !la ? a : e,
-                  style: const TextStyle(fontFamily: 'Cairo'),
-                )
-              ],
-            ),
-          ),
-        )));
-  }
-
-  var name = TextEditingController();
-  var phone = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Visibility(
-          visible: doneFilling,
-          child: Padding(
-            padding: const EdgeInsets.all(100.0),
-            child: VerificationCode(
-              fullBorder: true,
-              textStyle: TextStyle(fontSize: 20.0, color: Colors.blueGrey),
-              keyboardType: TextInputType.number,
-              underlineColor: Colors
-                  .green, // If this is null it will use primaryColor: Colors.red from Theme
-              length: 4,
-              cursorColor: Colors
-                  .blueGrey, // If this is null it will default to the ambient
-              // clearAll is NOT required, you can delete it
-              // takes any widget, so you can implement your design
-              clearAll: const Padding(
-                  padding: EdgeInsets.all(8.0), child: Icon(Icons.cancel)),
-              onCompleted: (String value) {
-                print(value);
-                setState(() {
-                  _code = value;
-                });
-              },
-              onEditing: (bool value) {
-                setState(() {
-                  _onEditing = value;
-                });
-                if (!_onEditing) FocusScope.of(context).unfocus();
-              },
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.pink.shade700,
+
+            Colors.purple.shade900,
+
+            //  Colors.blueGrey.shade900,
+          ],
+        )),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30.0),
+              child: Container(
+                child: Image.asset('lib/assets/new.png'),
+              ),
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(100.0),
-          child: Visibility(
-            visible: !doneFilling,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CupertinoTextField(
-                    controller: name,
-                    prefix: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(Icons.person),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 1.3,
+                child: TextField(
+                  controller: name,
+                  decoration: InputDecoration(
+                    labelStyle: TextStyle(color: Colors.white),
+                    labelText: context.watch<VehicleTypeController>().la
+                        ? 'الإسم '
+                        : 'Name',
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white, width: 1.0),
                     ),
-                    placeholder: 'Your name please !',
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    ),
+                    //  alignLabelWithHint:true ,
+                    //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CupertinoTextField(
-                    controller: phone,
-                    prefix: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Icon(Icons.call),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('+966')
-                        ],
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 20),
+              child: Row(
+                children: [
+                  const Expanded(flex: 1, child: Text('+966',
+                    style: TextStyle(color: Colors.white),
+                  )),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Expanded(
+                    flex: 9,
+                    child: TextField(
+                        keyboardType: TextInputType.phone,
+                      controller: phone,
+                      decoration: InputDecoration(
+                          labelStyle: TextStyle(color: Colors.white),
+                        labelText: context.watch<VehicleTypeController>().la
+                            ? 'رقم الهاتف'
+                            : 'Mobile Number',
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.white, width: 1.0),
+                        ),
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.grey, width: 1.0),
+                        ),
+                        //  alignLabelWithHint:true ,
+                        //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
                       ),
                     ),
-                    placeholder: 'Your phone number please !',
+                  ),
+                ],
+              ),
+            ),
+           
+
+           Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 1.3,
+                child: TextField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: email,
+                  decoration: InputDecoration(
+                    labelStyle: TextStyle(color: Colors.white),
+                    labelText: context.watch<VehicleTypeController>().la
+                        ? 'الإيميل '
+                        : 'Email',
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white, width: 1.0),
+                    ),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    ),
+                    //  alignLabelWithHint:true ,
+                    //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
                   ),
                 ),
-                Text(
-                  'We will send you a a text message with verification code ',
-                  style: TextStyle(fontSize: 10),
-                ),
-                SizedBox(
-                  height: 50,
-                ),
-              ],
+              ),
             ),
-          ),
+            
+           
+            _getActionButtons()
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: _getActionButtons(),
-        ),
-      ],
-    ));
+      ),
+    );
   }
 
+  var name = TextEditingController();
+  var email = TextEditingController();
+  var phone = TextEditingController();
+  bool val = true;
   Widget _getActionButtons() {
     return Padding(
-      padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 10.0),
+      padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 10.0),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -157,40 +158,39 @@ class _SignUpState extends State<SignUp> {
               padding: const EdgeInsets.only(right: 10.0),
               child: RaisedButton(
                 textColor: Colors.white,
-                color: Colors.teal,
-                onPressed: ()
-                    //  {
-                    //   setState(() {
-                    //     doneFilling = !doneFilling;
-                    //   });
-                    // }
-
-                    async {
-                  if (name.text.isEmpty) {
-                    errono('Enter a name please !', 'أدخل الإسم رجاء');
-                  } else if (phone.text.length < 9) {
+                color: Colors.white,
+                onPressed: () async {
+                  if (phone.text.length < 9 || name.text.isEmpty) {
                     errono('Enter a valid phone number please !',
-                        "أدخل رقم هاتف شخص مقرب رجاء");
+                        "أدخل رقم هاتف  صالح رجاء", context);
                   } else {
-                    if (doneFilling) {
-                      //////////////Get
-                      
-                    } else {
-                      setState(() {
-                        doneFilling = !doneFilling;
-                      });
-                    }
+                    setState(() {
+                      val = !val;
+                    });
+                    DBProvider.db.addMe([name.text, replaceArabicNumber(phone.text), email.text]);
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CheckPoint()),
+                      (Route<dynamic> route) => false,
+                    );
+                    // Get.to( AddDriver(9898989898));
                     // buy();
                   }
-                }
 
-                //   // });
-                // },
-
-                ,
+                  // });
+                },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0)),
-                child: Text(la == false ? "Confirm" : "تأكيد"),
+                child: GradientText(context.watch<VehicleTypeController>().la == false
+                    ? "Confirm"
+                    : "تأكيد",
+                      gradient: LinearGradient(colors: [
+                                      Colors.pink.shade700,
+                                      Colors.purple.shade900,
+                                    ]),
+                                    // style: TextStyle(fontSize: 30),
+                    
+                    ),
               ),
             ),
           ),
@@ -198,4 +198,5 @@ class _SignUpState extends State<SignUp> {
       ),
     );
   }
+
 }

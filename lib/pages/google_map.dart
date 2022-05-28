@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
+import 'package:costumer/helpers/make_trip.dart';
 import 'package:costumer/pages/models/get_location.dart';
 import 'package:costumer/pages/models/get_points_info.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,12 +13,15 @@ import 'package:geocoding/geocoding.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+
+import 'home.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:google_maps_flutter_web/google_maps_flutter_web.dart';
 
 class Mapi extends StatefulWidget {
   int whichOne;
-   Mapi(this.whichOne,{Key? key}) : super(key: key);
+  var info;
+   Mapi(this.whichOne,this.info,{Key? key}) : super(key: key);
 
   @override
   State<Mapi> createState() => _MapiState();
@@ -52,62 +56,97 @@ LatLng? currentCoordinat;
     var screenWidth = MediaQuery.of(context).size.width;
     var screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
+
+
+
+
+      floatingActionButton: Padding(
+        padding:EdgeInsets.only(right: screenWidth/6),
+        child: FloatingActionButton.extended(
+          
+          // extendedIconLabelSpacing:100.0,
+          onPressed: () {
+            if(Provider.of<VehicleTypeController>(context, listen: false).dropPoint.isEmpty){
+       
+                    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => Mapi(1,widget.info)),
+      (Route<dynamic> route) => false,
+    );
+            
+            }else{
+      Get.to(() =>Home(widget.info));
+            }
+           
+          },
+          label: SizedBox( width:screenWidth/2 ,
+            child: Center(child:  Text(context.watch<VehicleTypeController>().dropPoint.isEmpty?context.watch<VehicleTypeController>().la?'الى نقطة النهاية':'End Point':  context.watch<VehicleTypeController>().la?'الى النقل':'To the trip!'))),
+          // icon: const Icon(Icons.delivery_dining),
+        ),
+      ),
+
+
+
+
+
       body: Stack(
         children: [
           ///map
           initialPosition == null
               ? Center()
               : 
-              GoogleMap(
-                  myLocationEnabled: true,
-                  onTap: (o) {
-                    print(o);
-                  },
-                  markers: Set<Marker>.of(_markers.values),
-                  initialCameraPosition: CameraPosition(
-                    target: initialPosition!,
-                    zoom: 18.0,
-                  ),
-                  onMapCreated: _onMapCreated,
-                  onCameraMove: (CameraPosition position) {
-                    if (_markers.length > 0) {
-                      MarkerId markerId = MarkerId(_markerIdVal());
-                      Marker marker = _markers[markerId]!;
-                      Marker updatedMarker = marker.copyWith(
-                        positionParam: position.target,
-                      );
+              SizedBox(width: screenWidth,
+                child: GoogleMap(
+                    myLocationEnabled: true,
+                    onTap: (o) {
+                      print(o);
+                    },
+                    markers: Set<Marker>.of(_markers.values),
+                    initialCameraPosition: CameraPosition(
+                      target: initialPosition!,
+                      zoom: 18.0,
+                    ),
+                    onMapCreated: _onMapCreated,
+                    onCameraMove: (CameraPosition position) {
+                      if (_markers.length > 0) {
+                        MarkerId markerId = MarkerId(_markerIdVal());
+                        Marker marker = _markers[markerId]!;
+                        Marker updatedMarker = marker.copyWith(
+                          positionParam: position.target,
+                        );
 
-                      setState(() {
-                        
-                        getCordinateInfo(position.target.latitude,
-                                position.target.longitude)
-                            .then((n) {
-                          fullAdress = n;
-                          widget.whichOne==0?
-                          context.read<VehicleTypeController>().setFirstPoint([fullAdress[0] +
-                                          ', ' +
-                                          fullAdress[1] +
-                                          ', ' +
-                                          fullAdress[2] +
-                                          ',' +
-                                          fullAdress[3]+
-                                         
-                                          ',' +
-                                          fullAdress[4],position.target.latitude.toString(), position.target.longitude.toString()]):context.read<VehicleTypeController>().setDropPoint([fullAdress[0] +
-                                          ', ' +
-                                          fullAdress[1] +
-                                          ', ' +
-                                          fullAdress[2] +
-                                          ',' +
-                                          fullAdress[3]+
-                                         
-                                          ',' +
-                                          fullAdress[4],position.target.latitude.toString(), position.target.longitude.toString()]);
+                        setState(() {
+                          
+                          getCordinateInfo(position.target.latitude,
+                                  position.target.longitude)
+                              .then((n) {
+                            fullAdress = n;
+                            widget.whichOne==0?
+                            context.read<VehicleTypeController>().setFirstPoint([fullAdress[0] +
+                                            ', ' +
+                                            fullAdress[1] +
+                                            ', ' +
+                                            fullAdress[2] +
+                                            ',' +
+                                            fullAdress[3]+
+                                           
+                                            ',' +
+                                            fullAdress[4],position.target.latitude.toString(), position.target.longitude.toString()]):context.read<VehicleTypeController>().setDropPoint([fullAdress[0] +
+                                            ', ' +
+                                            fullAdress[1] +
+                                            ', ' +
+                                            fullAdress[2] +
+                                            ',' +
+                                            fullAdress[3]+
+                                           
+                                            ',' +
+                                            fullAdress[4],position.target.latitude.toString(), position.target.longitude.toString()]);
+                          });
+                          _markers[markerId] = updatedMarker;
                         });
-                        _markers[markerId] = updatedMarker;
-                      });
-                    }
-                  }),
+                      }
+                    }),
+              ),
 
           //app widget
 

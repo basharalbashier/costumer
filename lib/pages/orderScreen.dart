@@ -5,6 +5,7 @@ import 'package:community_material_icon/community_material_icon.dart';
 import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
 import 'package:costumer/helpers/show_cancel_buttomsheet.dart';
 import 'package:costumer/pages/models/get_polyline.dart';
+import 'package:costumer/pages/rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,9 @@ import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../main.dart';
+import 'check_page.dart';
 import 'models/retun_icon.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -36,6 +39,13 @@ class _OrderScreenState extends State<OrderScreen> {
       Provider.of<VehicleTypeController>(context, listen: false)
           .statusUpdate(orderInfo!['status']);
 
+if(orderInfo!['status']=='11'){
+      Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => RateProvider(orderInfo!['id'])),
+      (Route<dynamic> route) => false,
+    );
+}
       if (kDebugMode) {
         // print(jsonDecode(value.body));
       }
@@ -83,7 +93,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     orderInfo = widget.orderInfo;
-    _checkingTimer = Timer.periodic(Duration(seconds: 20), (Timer t) {
+    _checkingTimer = Timer.periodic(Duration(seconds:orderInfo!['status']=='0'? 20:360), (Timer t) {
       check();
     });
     super.initState();
@@ -138,7 +148,8 @@ class _OrderScreenState extends State<OrderScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      statusIcon(context.watch<VehicleTypeController>().status),
+                      statusIcon(context.watch<VehicleTypeController>().status,context.watch<VehicleTypeController>().la
+              ),
                       Expanded(
                         // flex: 5,
                         child: Padding(
@@ -149,7 +160,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       Visibility(visible:   orderInfo!['status'] !='11',
                         child: GestureDetector(
                             onTap: () {
-                              showCancelBottomSheet(context, orderInfo!['id']);
+                              showCancelBottomSheet(context, orderInfo!['id'],Provider.of<VehicleTypeController>(context, listen: false).la);
                             },
                             child: Icon(
                               Icons.cancel_rounded,
@@ -185,22 +196,27 @@ class _OrderScreenState extends State<OrderScreen> {
                   children: [
                     Visibility(
                       visible: orderInfo!['provider_name'] != null,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            orderInfo!['provider_name'] ?? '',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.headline6,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            orderInfo!['provider_phone'] ?? '',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.headline6,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      child:  GestureDetector(
+                          onTap:(){
+                                launch("tel://+966${orderInfo!['provider_phone']}");
+                              },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              orderInfo!['provider_name'] ?? '',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.headline6,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              orderInfo!['provider_phone'] ?? '',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.headline6,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -218,9 +234,10 @@ class _OrderScreenState extends State<OrderScreen> {
                         ),
                         Column(
                           children: [
-                            Text(
+                            Text(context.watch<VehicleTypeController>().la?'نقطة البداية':
                               'Pick-up address: ',
                               style: Theme.of(context).textTheme.headline6,
+                              // textAlign: TextAlign.start,
                             ),
                           ],
                         )
@@ -249,7 +266,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            Text(context.watch<VehicleTypeController>().la?"عنوان التسليم":
                               'Drop-off address: ',
                               style: Theme.of(context).textTheme.headline6,
                             ),
@@ -277,13 +294,13 @@ class _OrderScreenState extends State<OrderScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          orderInfo!['fee'] + ' SAR',
+                          orderInfo!['fee'] + ' ${context.watch<VehicleTypeController>().la?"ر.س":"SAR"} ',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.headline6,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          orderInfo!['distance'] + ' KM',
+                          orderInfo!['distance'] + ' ${context.watch<VehicleTypeController>().la?"ك.م":"KM"} ',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.headline6,
                           overflow: TextOverflow.ellipsis,

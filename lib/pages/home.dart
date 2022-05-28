@@ -15,6 +15,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/Vehicle_tybe_controller.dart';
@@ -66,7 +67,7 @@ class _HomeState extends State<Home> {
     });
   }
 
- 
+ bool wait=false;
   var choosenType;
   @override
   void initState() {
@@ -80,8 +81,9 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
 
-    if(list.isEmpty)
+    if(list.isEmpty || wait)
    {
+  
       return const Scaffold(body: Center(child: CircularProgressIndicator.adaptive()),);
        
    }
@@ -132,13 +134,18 @@ class _HomeState extends State<Home> {
           // const SlidingHeadings(),
           //pick location
 
-          const PointsCard(),
+           PointsCard(widget.info),
 
-          const Padding(
-            padding: EdgeInsets.only(left: 8.0),
-            child: Text(
-              "Available vehicles",
-              // style: Theme.of(context).textTheme.bodySmall,
+           Padding(
+            padding: EdgeInsets.only(left: 8.0,right: 8.0),
+            child: Row(
+              mainAxisAlignment:context.watch<VehicleTypeController>().la?MainAxisAlignment.end:MainAxisAlignment.start ,
+              children: [
+                Text(
+           context.watch<VehicleTypeController>().la?'المركبات المتوفرة':     "Available vehicles",
+                  // style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             ),
           ),
 
@@ -149,13 +156,16 @@ class _HomeState extends State<Home> {
       floatingActionButton: Visibility(
         visible: context.watch<VehicleTypeController>().index != 0 &&
             context.watch<VehicleTypeController>().dropPoint.isNotEmpty &&
-            context.watch<VehicleTypeController>().firstPoint.isNotEmpty,
+            context.watch<VehicleTypeController>().firstPoint.isNotEmpty && double.parse(Provider.of<VehicleTypeController>(context, listen: false).finalFee)>1.00,
         child: FloatingActionButton.extended(
           onPressed: () {
-            makeTrip(context,widget.info,choosenType);
+            setState(() {
+              wait=!wait;
+            });
+            makeTrip(context,widget.info,choosenType).then((value) => Future.delayed(Duration(seconds: 30)).then((value) =>mounted?setState(()=>wait=false):null));
           },
-          label: const Text('To the trip!'),
-          icon: const Icon(Icons.delivery_dining),
+          label:  Text(context.watch<VehicleTypeController>().la?'الى الرحلة':'To the trip!'),
+          icon: const Icon(  MdiIcons.tankerTruck,),
         ),
       ),
     );

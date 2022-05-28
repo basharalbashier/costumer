@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 import '../controllers/Vehicle_tybe_controller.dart';
 
 class PointsCard extends StatefulWidget {
-  const PointsCard({Key? key}) : super(key: key);
+  var info;
+   PointsCard(this.info,{Key? key}) : super(key: key);
 
   @override
   State<PointsCard> createState() => _PointsCardState();
@@ -26,19 +27,20 @@ class _PointsCardState extends State<PointsCard> {
         ),
         elevation: 10,
         child: SizedBox(
-          height: MediaQuery.of(context).size.height / 6,
-          child: Column(children: [
+          height: MediaQuery.of(context).size.height / 5,
+          child: ListView(children: [
             Row(
               children: [
                 Expanded(
-                  flex: 2,
+                  flex: 1,
                   child: Column(
-                   mainAxisSize: MainAxisSize.max,
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: const <Widget>[
                       Icon(
                         Icons.trip_origin,
-                        size: 15,
+                        size: 20,
+                        color: Colors.pink,
                       ),
                       Icon(
                         Icons.circle,
@@ -51,14 +53,16 @@ class _PointsCardState extends State<PointsCard> {
                       Icon(
                         Icons.circle,
                         size: 5,
-                      ),  Icon(
+                      ),
+                      Icon(
                         Icons.circle,
                         size: 5,
                       ),
                       Icon(
                         Icons.circle,
                         size: 5,
-                      ),  Icon(
+                      ),
+                      Icon(
                         Icons.circle,
                         size: 5,
                       ),
@@ -72,7 +76,8 @@ class _PointsCardState extends State<PointsCard> {
                       ),
                       Icon(
                         CommunityMaterialIcons.map_marker,
-                        size: 20,
+                        size: 25,
+                        color: Colors.pink,
                       )
                     ],
                   ),
@@ -85,17 +90,30 @@ class _PointsCardState extends State<PointsCard> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child:
-                     GestureDetector(
-                          onTap: () => Get.to(Mapi(0)),
+                        child: GestureDetector(
+                          onTap: () => Get.to(() => Mapi(0,widget.info)),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                             context.watch<VehicleTypeController>().la
+                                    ? MainAxisAlignment.center
+                                    : MainAxisAlignment.center,
                             children: [
                               Flexible(
                                 child: Text(
-                                 context.watch<VehicleTypeController>().firstPoint.isEmpty? 'Pick-up locaction':context.watch<VehicleTypeController>().firstPoint[0],
+                                  context
+                                          .watch<VehicleTypeController>()
+                                          .firstPoint
+                                          .isEmpty
+                                      ? context
+                                              .watch<VehicleTypeController>()
+                                              .la
+                                          ? 'موقع البداية'
+                                          : 'Pick-up locaction'
+                                      : context
+                                          .watch<VehicleTypeController>()
+                                          .firstPoint[0],
                                   style: Theme.of(context).textTheme.headline6,
-                                     overflow: TextOverflow.ellipsis,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               // ElevatedButton.icon(
@@ -118,20 +136,51 @@ class _PointsCardState extends State<PointsCard> {
                       const Divider(),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: GestureDetector(
-                          onTap: () => Get.to(Mapi(1)),
-                          child: Text(
-                          context.watch<VehicleTypeController>().dropPoint.isEmpty?  'Drop-off locaction':context.watch<VehicleTypeController>().dropPoint[0],
-                            style: Theme.of(context).textTheme.headline6,
-                               overflow: TextOverflow.ellipsis,
+                        child:GestureDetector(
+                              onTap: () {
+
+                                Provider.of<VehicleTypeController>(context, listen: false).firstPoint.isNotEmpty?Get.to(() => Mapi(1,widget.info)):null;
+                              } ,
+                          child: Row(
+                            mainAxisAlignment:
+                                context.watch<VehicleTypeController>().la
+                                    ? MainAxisAlignment.center
+                                    : MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child:  Text(
+                                  context
+                                          .watch<VehicleTypeController>()
+                                          .dropPoint
+                                          .isEmpty
+                                      ? context.watch<VehicleTypeController>().la
+                                          ? 'موقع الانزال'
+                                          : 'Drop-off locaction'
+                                      : context
+                                          .watch<VehicleTypeController>()
+                                          .dropPoint[0],
+                                       style: Theme.of(context).textTheme.headline6,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                       const Divider(),
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
+                     
+                      const Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                          context.watch<VehicleTypeController>().finalFeeData.isEmpty?  '':context.watch<VehicleTypeController>().finalFeeData.toString()+' SAR',
+                            context
+                                    .watch<VehicleTypeController>()
+                                    .finalFeeData
+                                    =='0.00'
+                                ? ''
+                                : '${context
+                                        .watch<VehicleTypeController>()
+                                        .finalFeeData} ${   context.watch<VehicleTypeController>().la?'ر.س': ' SAR'}',
                             style: Theme.of(context).textTheme.headline6,
                             //    overflow: TextOverflow.ellipsis,
                           ),

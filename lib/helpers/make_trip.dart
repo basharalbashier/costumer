@@ -13,9 +13,11 @@ import 'package:http/http.dart' as http;
 import '../controllers/Vehicle_tybe_controller.dart';
 import '../pages/orderScreen.dart';
 
-makeTrip(context,info,choosenType) {
+Future<bool> makeTrip(context,info,choosenType) async{
+  var respons;
+  bool ok=false;
     try {
-      http.post(Uri.parse('${url}api/orders'), headers: header, body: {
+     respons = await http.post(Uri.parse('${url}api/orders'), headers: header, body: {
         'user_name': info['name'],
         'user_phone': info['phone'],
         'start_address':
@@ -39,15 +41,15 @@ makeTrip(context,info,choosenType) {
         'distance': Provider.of<VehicleTypeController>(context, listen: false)
             .distanceData,
         'status': '0',
-      }).then((value) {
-        if ((value.statusCode == 200 || value.statusCode == 201) &&
+      });
+        if ((respons.statusCode == 200 || respons.statusCode == 201) &&
             Provider.of<VehicleTypeController>(context, listen: false)
                     .firstPoint[1] ==
-                jsonDecode(value.body)['start_late']) {
+                jsonDecode(respons.body)['start_late']) {
           if (kDebugMode) {
-            print(jsonDecode(value.body)['start_late']);
+            print(jsonDecode(respons.body)['start_late']);
           }
-          Map i = jsonDecode(value.body);
+          Map i = jsonDecode(respons.body);
                      Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (context) => OrderScreen(i)),
@@ -64,10 +66,12 @@ makeTrip(context,info,choosenType) {
         //
         //   }
         // }
-      });
+     
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
     }
+
+    return ok;
   }

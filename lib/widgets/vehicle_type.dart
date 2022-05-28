@@ -42,7 +42,12 @@ class _VehicleTypeState extends State<VehicleType> {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                     boxShadow: [
-                      BoxShadow(color: context.watch<VehicleTypeController>().count==widget.index?Colors.orange:Colors.grey, spreadRadius: 1),
+                      BoxShadow(
+                          color: context.watch<VehicleTypeController>().count ==
+                                  widget.index
+                              ? Colors.pink
+                              : Colors.grey,
+                          spreadRadius: 2),
                     ],
                   ),
                   height: 70,
@@ -60,11 +65,21 @@ class _VehicleTypeState extends State<VehicleType> {
                       Flexible(
                         child: ListTile(
                             title: Text(
-                              widget.vehicle['name'],
+                              context.watch<VehicleTypeController>().la
+                                  ? widget.vehicle['name']
+                                  : widget.vehicle['namee'],
                               textScaleFactor: 1,
-                              style: TextStyle(color: Colors.black),
+                              style: const TextStyle(color: Colors.black),
                             ),
-                            subtitle: Text(widget.vehicle['cap_en'])),
+                            subtitle: Visibility(
+                                visible: context
+                                        .watch<VehicleTypeController>()
+                                        .count ==
+                                    widget.index,
+                                child: Text(
+                                    context.watch<VehicleTypeController>().la
+                                        ? widget.vehicle['cap_ar']
+                                        : widget.vehicle['cap_en']))),
                       )
                     ],
                   ),
@@ -73,27 +88,23 @@ class _VehicleTypeState extends State<VehicleType> {
             ),
             Positioned(
                 right: 20,
-                top: 15,
+                top: 12,
                 child: Visibility(
-                  visible:context.watch<VehicleTypeController>().count==widget.index,
+                  visible: context.watch<VehicleTypeController>().count ==
+                      widget.index,
                   child: Icon(
                     Icons.check_circle,
-                    color: Colors.orange,
+                    color: Colors.pink,
                   ),
                 ))
           ],
         ),
         Visibility(
-          visible: context.watch<VehicleTypeController>().count==widget.index,
+          visible: context.watch<VehicleTypeController>().count == widget.index,
           child: Padding(
             padding: const EdgeInsets.only(
                 bottom: 30.0, left: 60.0, right: 60.0, top: 8),
             child: Container(
-              child: Center(
-                  child: Text(
-                widget.vehicle['dis_en'],
-                style: Theme.of(context).textTheme.caption,
-              )),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.grey.shade200,
@@ -102,6 +113,13 @@ class _VehicleTypeState extends State<VehicleType> {
                 // ],
               ),
               height: 100,
+              child: Center(
+                  child: Text(
+                context.watch<VehicleTypeController>().la
+                    ? widget.vehicle['dis_ar']
+                    : widget.vehicle['dis_en'],
+                style: Theme.of(context).textTheme.caption,
+              )),
             ),
           ),
         ),
