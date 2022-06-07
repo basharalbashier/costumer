@@ -56,7 +56,11 @@ class _CheckPointState extends State<CheckPoint> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Container(
-              child: Image.asset('lib/assets/new.png'),
+              child: Column(
+                children: [
+                  Image.asset('lib/assets/white.png'),
+                ],
+              ),
             ),
             Padding(
                 padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 10.0),
@@ -78,9 +82,12 @@ class _CheckPointState extends State<CheckPoint> {
                                     context
                                         .read<VehicleTypeController>()
                                         .setLa(true);
-                                    Get.to(SignUp());
+                                    Get.to(()=>const SignUp());
                                   },
                                   child: GradientText(
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900),
                                     "العربية",
                                     gradient: LinearGradient(colors: [
                                       Colors.pink.shade700,
@@ -101,9 +108,12 @@ class _CheckPointState extends State<CheckPoint> {
                                     context
                                         .read<VehicleTypeController>()
                                         .setLa(false);
-                                    Get.to(SignUp());
+                                    Get.to(()=>const SignUp());
                                   },
                                   child: GradientText(
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900),
                                     "English",
                                     gradient: LinearGradient(colors: [
                                       Colors.pink.shade700,

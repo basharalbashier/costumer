@@ -28,62 +28,43 @@ class _PointsCardState extends State<PointsCard> {
         elevation: 10,
         child: SizedBox(
           height: MediaQuery.of(context).size.height / 5,
-          child: ListView(children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    // mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const <Widget>[
-                      Icon(
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Column(
+                  // mainAxisSize: MainAxisSize.max,
+                  // mainAxisAlignment: MainAxisAlignment.start,
+                  children:  <Widget>[
+                    const Padding(
+                      padding: EdgeInsets.only(top:10.0),
+                      child: Icon(
                         Icons.trip_origin,
                         size: 20,
                         color: Colors.pink,
                       ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        Icons.circle,
-                        size: 5,
-                      ),
-                      Icon(
-                        CommunityMaterialIcons.map_marker,
-                        size: 25,
-                        color: Colors.pink,
-                      )
-                    ],
-                  ),
+                    ),
+                for(int i=0; i<10;i++)
+                  const Icon(
+                      Icons.circle,
+                      size: 5,
+                    ),
+                   
+                   
+                    const Icon(
+                      CommunityMaterialIcons.map_marker,
+                      size: 25,
+                      color: Colors.pink,
+                    )
+                  ],
                 ),
-                Expanded(
-                  flex: 8,
+              ),
+             
+             
+             
+              Expanded(
+                flex: 8,
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,7 +119,7 @@ class _PointsCardState extends State<PointsCard> {
                         padding: const EdgeInsets.all(8.0),
                         child:GestureDetector(
                               onTap: () {
-
+                
                                 Provider.of<VehicleTypeController>(context, listen: false).firstPoint.isNotEmpty?Get.to(() => Mapi(1,widget.info)):null;
                               } ,
                           child: Row(
@@ -189,20 +170,9 @@ class _PointsCardState extends State<PointsCard> {
                     ],
                   ),
                 ),
-              ],
-            ),
-            // Divider(),
-            // Center(
-            //   child: ElevatedButton.icon(
-            //     onPressed: () {},
-            //     icon: Icon(Icons.add),
-            //     label: Text(
-            //       'NOW',
-            //       style: Theme.of(context).textTheme.button,
-            //     ),
-            //   ),
-            // )
-          ]),
+              ),
+            ],
+          ),
         ),
       ),
     );

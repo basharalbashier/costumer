@@ -36,7 +36,7 @@ void main() {
         fontFamily: 'Cairo',
         primarySwatch: Colors.blueGrey,
       ),
-      home: CheckPoint(),
+      home: const CheckPoint(),
     ),
   ));
 }

@@ -37,105 +37,129 @@ class _SignUpState extends State<SignUp> {
             //  Colors.blueGrey.shade900,
           ],
         )),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 30.0),
-              child: Container(
-                child: Image.asset('lib/assets/new.png'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width / 1.3,
-                child: TextField(
-                  controller: name,
-                  decoration: InputDecoration(
-                    labelStyle: TextStyle(color: Colors.white),
-                    labelText: context.watch<VehicleTypeController>().la
-                        ? 'الإسم '
-                        : 'Name',
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white, width: 1.0),
-                    ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                    ),
-                    //  alignLabelWithHint:true ,
-                    //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
-                  ),
-                ),
-              ),
-            ),
-            
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 20),
-              child: Row(
+
+        
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 30.0),
+                child: SizedBox(
+              child: Column(
                 children: [
-                  const Expanded(flex: 1, child: Text('+966',
-                    style: TextStyle(color: Colors.white),
-                  )),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Expanded(
-                    flex: 9,
-                    child: TextField(
-                        keyboardType: TextInputType.phone,
-                      controller: phone,
-                      decoration: InputDecoration(
-                          labelStyle: TextStyle(color: Colors.white),
-                        labelText: context.watch<VehicleTypeController>().la
-                            ? 'رقم الهاتف'
-                            : 'Mobile Number',
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.white, width: 1.0),
-                        ),
-                        enabledBorder: const OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.grey, width: 1.0),
-                        ),
-                        //  alignLabelWithHint:true ,
-                        //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
-                      ),
-                    ),
-                  ),
+                  Image.asset('lib/assets/white.png'),
+                  Text( context.watch<VehicleTypeController>().la
+                          ? 'الإيميل '
+                          : 'Email',),
                 ],
               ),
-            ),
-           
-
-           Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width / 1.3,
-                child: TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  controller: email,
-                  decoration: InputDecoration(
-                    labelStyle: TextStyle(color: Colors.white),
-                    labelText: context.watch<VehicleTypeController>().la
-                        ? 'الإيميل '
-                        : 'Email',
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white, width: 1.0),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.3,
+                  child: TextField(
+                    controller: name,
+                        textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
+                    decoration: InputDecoration(
+                      label:Row(mainAxisAlignment:context.watch<VehicleTypeController>().la? MainAxisAlignment.end:MainAxisAlignment.start,
+                        
+                        children: [
+                          Text(context.watch<VehicleTypeController>().la
+                              ? 'الإسم '
+                              : 'Name',textAlign:TextAlign.end ,),
+                        ],
+                      ) ,
+                      labelStyle: const TextStyle(color: Colors.white),
+                      // labelText: 
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white, width: 1.0),
+                      ),
+                      enabledBorder:  const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderSide: BorderSide(color: Colors.white, width: 1.0),
+                      ),
+                      //  alignLabelWithHint:true ,
+                      //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
                     ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                    ),
-                    //  alignLabelWithHint:true ,
-                    //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
                   ),
                 ),
               ),
-            ),
-            
-           
-            _getActionButtons()
-          ],
+              
+              Padding(
+                padding: const  EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.3,
+                  child: TextField(
+                      keyboardType: TextInputType.phone,
+                    controller: phone,
+                      //  textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
+                    decoration: InputDecoration(
+                      label:Row(mainAxisAlignment:context.watch<VehicleTypeController>().la? MainAxisAlignment.end:MainAxisAlignment.start,
+                        
+                        children: [
+                          Text( context.watch<VehicleTypeController>().la
+                          ? 'رقم الهاتف'
+                          : 'Mobile Number',),
+                        ],
+                      ) ,
+                      prefix: const Text('+966  ',style: TextStyle(color: Colors.white),),
+                        labelStyle: const TextStyle(color: Colors.white),
+             
+                     focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white, width: 1.0),
+                      ),
+                    enabledBorder:  const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderSide: BorderSide(color: Colors.white, width: 1.0),
+                      ),
+                      //  alignLabelWithHint:true ,
+                      //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
+                    ),
+                  ),
+                ),
+              ),
+             
+        
+             Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.3,
+                  child: TextField(
+                    keyboardType: TextInputType.emailAddress,
+                    controller: email,
+            //  textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
+                    decoration: InputDecoration(
+                      label:Row(mainAxisAlignment:context.watch<VehicleTypeController>().la? MainAxisAlignment.end:MainAxisAlignment.start,
+                        
+                        children: [
+                          Text( context.watch<VehicleTypeController>().la
+                          ? 'الإيميل '
+                          : 'Email',),
+                        ],
+                      ) ,
+                      labelStyle: TextStyle(color: Colors.white),
+             
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white, width: 1.0),
+                      ),
+                     enabledBorder:  const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderSide: BorderSide(color: Colors.white, width: 1.0),
+                      ),
+                      //  alignLabelWithHint:true ,
+                      //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
+                    ),
+                  ),
+                ),
+              ),
+              
+             
+              _getActionButtons()
+            ],
+          ),
         ),
       ),
     );
@@ -157,7 +181,7 @@ class _SignUpState extends State<SignUp> {
             child: Padding(
               padding: const EdgeInsets.only(right: 10.0),
               child: RaisedButton(
-                textColor: Colors.white,
+                // textColor: Colors.white,
                 color: Colors.white,
                 onPressed: () async {
                   if (phone.text.length < 9 || name.text.isEmpty) {
@@ -188,7 +212,8 @@ class _SignUpState extends State<SignUp> {
                                       Colors.pink.shade700,
                                       Colors.purple.shade900,
                                     ]),
-                                    // style: TextStyle(fontSize: 30),
+                                    // style: TextStyle(),
+                                    style: TextStyle(fontSize: 20,fontWeight: FontWeight.w900),
                     
                     ),
               ),

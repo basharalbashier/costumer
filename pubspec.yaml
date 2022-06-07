@@ -82,17 +82,18 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/assets/new.png
+    - lib/assets/white.png
+    - lib/assets/colored.png
   #   - images/a_dot_ham.jpeg
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "lib/assets/new.png"
+  image_path: "lib/assets/New2.png"
   remove_alpha_ios: true
 
 flutter_native_splash:
   color: "#FFFFFF"
-  image: lib/assets/new.png
+  image: lib/assets/colored.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
