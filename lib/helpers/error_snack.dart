@@ -1,17 +1,12 @@
-
-
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/Vehicle_tybe_controller.dart';
 
 errono(a, e, context) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Row(
+  var snack = SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       const Icon(
         Icons.error,
@@ -26,5 +21,7 @@ errono(a, e, context) {
         style: const TextStyle(fontFamily: 'Cairo'),
       )
     ],
-  )));
+  ));
+
+  ScaffoldMessenger.of(context).showSnackBar(snack);
 }

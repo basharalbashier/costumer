@@ -71,15 +71,11 @@ class _PointsCardState extends State<PointsCard> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: GestureDetector(
-                          onTap: () => Get.to(() => Mapi(0,widget.info)),
-                          child: Row(
-                            mainAxisAlignment:
-                             context.watch<VehicleTypeController>().la
-                                    ? MainAxisAlignment.center
-                                    : MainAxisAlignment.center,
-                            children: [
-                              Flexible(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => Get.to(() => Mapi(0,widget.info)),
                                 child: Text(
                                   context
                                           .watch<VehicleTypeController>()
@@ -94,24 +90,13 @@ class _PointsCardState extends State<PointsCard> {
                                           .watch<VehicleTypeController>()
                                           .firstPoint[0],
                                   style: Theme.of(context).textTheme.headline6,
-                                  overflow: TextOverflow.ellipsis,
+                                  overflow: TextOverflow.fade,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
                                 ),
                               ),
-                              // ElevatedButton.icon(
-                              //   style: ElevatedButton.styleFrom(
-                              //       primary: Colors.white),
-                              //   onPressed: () {},
-                              //   icon: const Icon(
-                              //     Icons.alarm,
-                              //     color: Colors.blueGrey,
-                              //   ),
-                              //   label: Text(
-                              //     'NOW',
-                              //     style: Theme.of(context).textTheme.button,
-                              //   ),
-                              // )
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                       const Divider(),
@@ -128,8 +113,8 @@ class _PointsCardState extends State<PointsCard> {
                                     ? MainAxisAlignment.center
                                     : MainAxisAlignment.center,
                             children: [
-                              Flexible(
-                                child:  Text(
+                              Expanded(
+                                child: Text(
                                   context
                                           .watch<VehicleTypeController>()
                                           .dropPoint
@@ -141,7 +126,8 @@ class _PointsCardState extends State<PointsCard> {
                                           .watch<VehicleTypeController>()
                                           .dropPoint[0],
                                        style: Theme.of(context).textTheme.headline6,
-                                  overflow: TextOverflow.ellipsis,
+                                   overflow: TextOverflow.fade,
+                                    textAlign: TextAlign.center,
                                 ),
                               ),
                             ],
@@ -149,24 +135,7 @@ class _PointsCardState extends State<PointsCard> {
                         ),
                       ),
                      
-                      const Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            context
-                                    .watch<VehicleTypeController>()
-                                    .finalFeeData
-                                    =='0.00'
-                                ? ''
-                                : '${context
-                                        .watch<VehicleTypeController>()
-                                        .finalFeeData} ${   context.watch<VehicleTypeController>().la?'ر.س': ' SAR'}',
-                            style: Theme.of(context).textTheme.headline6,
-                            //    overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
+                    
                     ],
                   ),
                 ),

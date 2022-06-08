@@ -1,27 +1,22 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
-import 'package:costumer/helpers/make_trip.dart';
 import 'package:costumer/pages/models/get_location.dart';
 import 'package:costumer/pages/models/get_points_info.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'home.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:google_maps_flutter_web/google_maps_flutter_web.dart';
 
 class Mapi extends StatefulWidget {
-  int whichOne;
+  final int whichOne;
   var info;
-   Mapi(this.whichOne,this.info,{Key? key}) : super(key: key);
+  Mapi(this.whichOne, this.info, {Key? key}) : super(key: key);
 
   @override
   State<Mapi> createState() => _MapiState();
@@ -31,7 +26,7 @@ class _MapiState extends State<Mapi> {
   final Completer<GoogleMapController> _controller = Completer();
   final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
   int _markerIdCounter = 0;
-LatLng? currentCoordinat;
+  LatLng? currentCoordinat;
   LatLng? initialPosition;
   List<dynamic> fullAdress = [];
   @override
@@ -56,97 +51,108 @@ LatLng? currentCoordinat;
     var screenWidth = MediaQuery.of(context).size.width;
     var screenheight = MediaQuery.of(context).size.height;
     return Scaffold(
-
-
-
-
       floatingActionButton: Padding(
-        padding:EdgeInsets.only(right: screenWidth/6),
+        padding: EdgeInsets.only(right: screenWidth / 6),
         child: FloatingActionButton.extended(
-          
           // extendedIconLabelSpacing:100.0,
           onPressed: () {
-            if(Provider.of<VehicleTypeController>(context, listen: false).dropPoint.isEmpty){
-       
-                    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => Mapi(1,widget.info)),
-      (Route<dynamic> route) => false,
-    );
-            
-            }else{
-      Get.to(() =>Home(widget.info));
+            if (Provider.of<VehicleTypeController>(context, listen: false)
+                .dropPoint
+                .isEmpty) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => Mapi(1, widget.info)),
+                (Route<dynamic> route) => false,
+              );
+            } else {
+              Get.to(() => Home(widget.info));
             }
-           
           },
-          label: SizedBox( width:screenWidth/2 ,
-            child: Center(child:  Text(context.watch<VehicleTypeController>().dropPoint.isEmpty?context.watch<VehicleTypeController>().la?'الى نقطة النهاية':'End Point':  context.watch<VehicleTypeController>().la?'الى النقل':'To the trip!'))),
+          label: SizedBox(
+              width: screenWidth / 2,
+              child: Center(
+                  child: Text(
+                      context.watch<VehicleTypeController>().dropPoint.isEmpty
+                          ? context.watch<VehicleTypeController>().la
+                              ? 'الى نقطة النهاية'
+                              : 'End Point'
+                          : context.watch<VehicleTypeController>().la
+                              ? 'الى النقل'
+                              : 'To the trip!'))),
           // icon: const Icon(Icons.delivery_dining),
         ),
       ),
-
-
-
-
-
       body: Stack(
         children: [
           ///map
           initialPosition == null
-              ? Center()
-              : 
-              SizedBox(width: screenWidth,
-                child: GoogleMap(
-                    myLocationEnabled: true,
-                    onTap: (o) {
-                      print(o);
-                    },
-                    markers: Set<Marker>.of(_markers.values),
-                    initialCameraPosition: CameraPosition(
-                      target: initialPosition!,
-                      zoom: 18.0,
-                    ),
-                    onMapCreated: _onMapCreated,
-                    onCameraMove: (CameraPosition position) {
-                      if (_markers.length > 0) {
-                        MarkerId markerId = MarkerId(_markerIdVal());
-                        Marker marker = _markers[markerId]!;
-                        Marker updatedMarker = marker.copyWith(
-                          positionParam: position.target,
-                        );
+              ? const Center()
+              : SizedBox(
+                  width: screenWidth,
+                  child: GoogleMap(
+                      myLocationEnabled: true,
+                      onTap: (o) {
+                        if (kDebugMode) {
+                          print(o);
+                        }
+                      },
+                      markers: Set<Marker>.of(_markers.values),
+                      initialCameraPosition: CameraPosition(
+                        target: initialPosition!,
+                        zoom: 18.0,
+                      ),
+                      onMapCreated: _onMapCreated,
+                      onCameraMove: (CameraPosition position) {
+                        if (_markers.length > 0) {
+                          MarkerId markerId = MarkerId(_markerIdVal());
+                          Marker marker = _markers[markerId]!;
+                          Marker updatedMarker = marker.copyWith(
+                            positionParam: position.target,
+                            
+                          );
 
-                        setState(() {
-                          
-                          getCordinateInfo(position.target.latitude,
-                                  position.target.longitude)
-                              .then((n) {
-                            fullAdress = n;
-                            widget.whichOne==0?
-                            context.read<VehicleTypeController>().setFirstPoint([fullAdress[0] +
-                                            ', ' +
-                                            fullAdress[1] +
-                                            ', ' +
-                                            fullAdress[2] +
-                                            ',' +
-                                            fullAdress[3]+
-                                           
-                                            ',' +
-                                            fullAdress[4],position.target.latitude.toString(), position.target.longitude.toString()]):context.read<VehicleTypeController>().setDropPoint([fullAdress[0] +
-                                            ', ' +
-                                            fullAdress[1] +
-                                            ', ' +
-                                            fullAdress[2] +
-                                            ',' +
-                                            fullAdress[3]+
-                                           
-                                            ',' +
-                                            fullAdress[4],position.target.latitude.toString(), position.target.longitude.toString()]);
+                          setState(() {
+                            getCordinateInfo(position.target.latitude,
+                                    position.target.longitude)
+                                .then((n) {
+                              fullAdress = n;
+                              widget.whichOne == 0
+                                  ? context
+                                      .read<VehicleTypeController>()
+                                      .setFirstPoint([
+                                      fullAdress[0] +
+                                          ', ' +
+                                          fullAdress[1] +
+                                          ', ' +
+                                          fullAdress[2] +
+                                          ',' +
+                                          fullAdress[3] +
+                                          ',' +
+                                          fullAdress[4],
+                                      position.target.latitude.toString(),
+                                      position.target.longitude.toString()
+                                    ])
+                                  : context
+                                      .read<VehicleTypeController>()
+                                      .setDropPoint([
+                                      fullAdress[0] +
+                                          ', ' +
+                                          fullAdress[1] +
+                                          ', ' +
+                                          fullAdress[2] +
+                                          ',' +
+                                          fullAdress[3] +
+                                          ',' +
+                                          fullAdress[4],
+                                      position.target.latitude.toString(),
+                                      position.target.longitude.toString()
+                                    ]);
+                            });
+                            _markers[markerId] = updatedMarker;
                           });
-                          _markers[markerId] = updatedMarker;
-                        });
-                      }
-                    }),
-              ),
+                        }
+                      }),
+                ),
 
           //app widget
 
@@ -155,8 +161,7 @@ LatLng? currentCoordinat;
               left: 10,
               child: Visibility(
                 visible: fullAdress.isNotEmpty,
-                child:
-                 Container(
+                child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white.withOpacity(.5),
@@ -165,17 +170,17 @@ LatLng? currentCoordinat;
                     // ],
                   ),
                   width: screenWidth - 20,
-                  // height: 50,
+                 
 
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                       GestureDetector(
-                         onTap:() => Get.back(),
-                         child: Icon(CupertinoIcons.back)),
-                      Expanded(
-                            // flex: 5,
+                        GestureDetector(
+                            onTap: () => Get.back(),
+                            child: const Icon(CupertinoIcons.back)),
+                        Expanded(
+                          // flex: 5,
                           child: Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Container(
@@ -189,12 +194,10 @@ LatLng? currentCoordinat;
                                           fullAdress[1] +
                                           ', ' +
                                           fullAdress[2] +
-                                          ' \n' +
-                                          fullAdress[3]+
-                                         
-                                          ' \n' +
-                                          fullAdress[4]
-                                          ,
+                                          ' ,' +
+                                          fullAdress[3] +
+                                          ' ,' +
+                                          fullAdress[4],
                                   // style: Theme.of(context).textTheme.headline6,
                                 ),
                               ),
@@ -205,12 +208,9 @@ LatLng? currentCoordinat;
                     ),
                   ),
                 ),
-             
               ))
-       
         ],
       ),
-
     );
   }
 

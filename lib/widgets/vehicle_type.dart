@@ -55,8 +55,8 @@ class _VehicleTypeState extends State<VehicleType> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Icon(
                           MdiIcons.tankerTruck,
                           size: 50,
@@ -64,6 +64,21 @@ class _VehicleTypeState extends State<VehicleType> {
                       ),
                       Flexible(
                         child: ListTile(
+                            trailing: SizedBox(width: 55,
+                              child: Text(
+                                
+                                context
+                                            .watch<VehicleTypeController>()
+                                            .finalFeeData ==
+                                        '0.00'
+                                    ? ''
+                                    : '${context.watch<VehicleTypeController>().finalFeeData} ${context.watch<VehicleTypeController>().la ? 'ر.س' : ' SAR'}',
+                                // style: Theme.of(context).textTheme.headline6,
+                                textAlign: TextAlign.center,
+
+                                //    overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                             title: Text(
                               context.watch<VehicleTypeController>().la
                                   ? widget.vehicle['name']
@@ -77,9 +92,11 @@ class _VehicleTypeState extends State<VehicleType> {
                                         .count ==
                                     widget.index,
                                 child: Text(
-                                    context.watch<VehicleTypeController>().la
-                                        ? widget.vehicle['cap_ar']
-                                        : widget.vehicle['cap_en']))),
+                                  context
+                                      .watch<VehicleTypeController>()
+                                        .la
+                                    ? widget.vehicle['cap_ar'].toString()
+                                    : widget.vehicle['cap_en'].toString()))),
                       )
                     ],
                   ),

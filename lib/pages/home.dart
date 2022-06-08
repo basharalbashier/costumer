@@ -1,28 +1,25 @@
 import 'dart:convert';
 
+import 'package:costumer/helpers/check_internet.dart';
+import 'package:costumer/helpers/error_snack.dart';
 import 'package:costumer/helpers/get_my_orders.dart';
 import 'package:costumer/helpers/gradiant_text.dart';
 import 'package:costumer/pages/models/colculating_distans.dart';
 import 'package:costumer/pages/models/colculating_fee.dart';
-import 'package:costumer/pages/orderScreen.dart';
 import 'package:costumer/widgets/drawer.dart';
 import 'package:costumer/widgets/poins_cards.dart';
-import 'package:costumer/widgets/sliding_heading.dart';
 import 'package:costumer/widgets/vehicle_type.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:community_material_icon/community_material_icon.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/Vehicle_tybe_controller.dart';
+import '../helpers/constants.dart';
 import '../helpers/make_trip.dart';
-import '../main.dart';
+import '../widgets/sliding_heading.dart';
 
 class Home extends StatefulWidget {
   var info;
@@ -34,52 +31,30 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _key = GlobalKey();
-  List list = [
-    // {
-    //   'id': '1',
-    //   'name': 'orfoj',
-    //   'namee': 'iqhgqih',
-    //   'cap_en': 'cap_en',
-    //   'dis_en': 'dis_en',
-    //   'kilo_price': '10.00',
-    //   'sec_price': '20.00',
-    //   'cap_ar':'cap_ar',
-    //   'dis_ar':'dis_ar'
-    // },
-    // {
-    //   'id': '2',
-    //   'name': 'bkjb,bbb',
-    //   'namee': 'nmnvmnbhgdfgd',
-    //   'cap_en': 'jhkfkhgfhgkfghk',
-    //   'dis_en': 'jhfkkfuy',
-    //   'kilo_price': '50.00',
-    //   'sec_price': '80.00',
-    //   'cap_ar':'cap_ar',
-    //   'dis_ar':'dis_ar',
-
-    // },
-  ];
+  List list = [];
   getvehicle() {
-    http.get(Uri.parse('${url}api/car'), headers: header).then((value) {
-      setState(() {
-        list = jsonDecode(value.body);
-      });
-      // if (kDebugMode) {
-      //   print(list);
-      // }
-      // for (var i in list) {
-      //   if (kDebugMode) {
-      //     print(i);
-      //   }
-      // }
-    });
+    checkInternetConnection().then((value) => value == 1
+        ? http.get(Uri.parse('${url}api/car'), headers: {
+               "Accept": "application/json",
+        }).then((value) {
+         
+            if (value.statusCode == 200 || value.statusCode == 201) {
+              setState(() {
+                list = jsonDecode(value.body);
+              });
+            } else {
+              errono("خطأ من مشغلاتنا، نعتذر", "Server error", context);
+            }
+          })
+        : errono("تعذر الإتصال بالإنترنت", "Unable to connect to the Internet",
+            context));
   }
 
   bool wait = false;
   var choosenType;
   @override
   void initState() {
-    getMyOreders(widget.info['phone'], context);
+    getMyOreders(widget.info, context);
     getvehicle();
 
     super.initState();
@@ -87,7 +62,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    if (list.isEmpty || wait) {
+    if (wait) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator.adaptive()),
       );
@@ -95,12 +70,15 @@ class _HomeState extends State<Home> {
 
     FlutterNativeSplash.remove();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      choosenType = list[
-          Provider.of<VehicleTypeController>(context, listen: false).index != 0
-              ? Provider.of<VehicleTypeController>(context, listen: false)
-                      .index -
-                  1
-              : 0];
+      if (list.isNotEmpty) {
+        choosenType = list[
+            Provider.of<VehicleTypeController>(context, listen: false).index !=
+                    0
+                ? Provider.of<VehicleTypeController>(context, listen: false)
+                        .index -
+                    1
+                : 0];
+      }
 
       if (Provider.of<VehicleTypeController>(context, listen: false).index !=
               0 &&
@@ -167,43 +145,43 @@ class _HomeState extends State<Home> {
           ],
         ),
         actions: [
-          GestureDetector(
-              onTap: (() =>
-                  Provider.of<VehicleTypeController>(context, listen: false)
-                      .setLa(!Provider.of<VehicleTypeController>(context,
-                              listen: false)
-                          .la)),
-              child: Icon(
-                Icons.language,
-                color: Colors.blueGrey.shade900,
-              ))
+          Padding(
+            padding: const EdgeInsets.only(right: 15.0),
+            child: GestureDetector(
+                onTap: (() =>
+                    Provider.of<VehicleTypeController>(context, listen: false)
+                        .setLa(!Provider.of<VehicleTypeController>(context,
+                                listen: false)
+                            .la)),
+                child: Icon(
+                  Icons.language,
+                  color: Colors.blueGrey.shade900,
+                )),
+          )
         ],
       ),
       body: ListView(
         children: <Widget>[
           // const SlidingHeadings(),
-          //pick location
-
           PointsCard(widget.info),
-
-          Padding(
-            padding: EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Row(
-              mainAxisAlignment: context.watch<VehicleTypeController>().la
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.start,
-              children: [
-                Text(
-                  context.watch<VehicleTypeController>().la
-                      ? 'المركبات المتوفرة'
-                      : "Available vehicles",
-                  // style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+          Visibility(
+            visible: list.isNotEmpty,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: Row(
+                mainAxisAlignment: context.watch<VehicleTypeController>().la
+                    ? MainAxisAlignment.end
+                    : MainAxisAlignment.start,
+                children: [
+                  Text(
+                    context.watch<VehicleTypeController>().la
+                        ? 'المركبات المتوفرة'
+                        : "Available vehicles",
+                  ),
+                ],
+              ),
             ),
           ),
-
-          //vehicle type
           for (int i = 1; i <= list.length; i++) VehicleType(list[i - 1], i)
         ],
       ),
@@ -220,9 +198,21 @@ class _HomeState extends State<Home> {
             setState(() {
               wait = !wait;
             });
-            makeTrip(context, widget.info, choosenType).then((value) =>
-                Future.delayed(Duration(seconds: 30)).then(
-                    (value) => mounted ? setState(() => wait = false) : null));
+           
+            checkInternetConnection().then((value) => value == 1
+                ? makeTrip(context, widget.info, choosenType).then((isItDone) =>
+                    Future.delayed(const Duration(seconds: 30))
+                        .then((value) => mounted && !isItDone
+                            ? {
+                                setState(() => wait = false),
+                                errono(
+                                    "تعذر الإتصال بمشغلاتنا، رجاء حاول مرة أخرى",
+                                    "Unable to contact our operators, please try again",
+                                    context)
+                              }
+                            : null))
+                : errono("تعذر الإتصال بالإنترنت",
+                    "Unable to connect to the Internet", context));
           },
           label: Text(context.watch<VehicleTypeController>().la
               ? 'الى الرحلة'

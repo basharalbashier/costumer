@@ -1,18 +1,20 @@
 import 'dart:convert';
-
-import 'package:costumer/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../pages/orderScreen.dart';
+import 'constants.dart';
 
-Future<List> getMyOreders(phone, context) async {
+Future<List> getMyOreders(info, context) async {
   List list = [];
- 
+
   try {
-    var response = await http
-        .post(Uri.parse('${url}api/orders/my_orders/$phone'), headers: header);
- print(json.decode(response.body));
+    var response = await http.post(
+        Uri.parse('${url}api/orders/my_orders/${info['phone']}'),
+        headers: {
+          "Accept": "application/json",
+          'Authorization': 'Bearer ${info['token']}'
+        });
     for (var i in json.decode(response.body)) {
       if (i['status'] == '0' ||
           i['status'] == '7' ||

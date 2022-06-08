@@ -9,18 +9,19 @@ import 'package:costumer/pages/rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../main.dart';
-import 'check_page.dart';
+import '../helpers/check_internet.dart';
+import '../helpers/constants.dart';
+import '../helpers/error_snack.dart';
+import 'models/db.dart';
 import 'models/retun_icon.dart';
 
 class OrderScreen extends StatefulWidget {
-  Map orderInfo;
-  OrderScreen(this.orderInfo, {Key? key}) : super(key: key);
+  final Map orderInfo;
+  const OrderScreen(this.orderInfo, {Key? key}) : super(key: key);
 
   @override
   State<OrderScreen> createState() => _OrderScreenState();
@@ -28,16 +29,23 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   Map? orderInfo;
-  check() {
-    http
+  check() async{
+    var info = await DBProvider.db.getMe();
+   await http
         .get(Uri.parse('${url}api/orders/${widget.orderInfo['id']}'),
-            headers: header)
+            headers: {
+                    "Accept": "application/json",
+      'Authorization': 'Bearer ${info[0]['token']}'
+            })
         .then((value) {
-      setState(() {
+     if(mounted){
+        setState(() {
         orderInfo = jsonDecode(value.body);
       });
-      Provider.of<VehicleTypeController>(context, listen: false)
+       Provider.of<VehicleTypeController>(context, listen: false)
           .statusUpdate(orderInfo!['status']);
+     }
+     
 
 if(orderInfo!['status']=='11'){
       Navigator.pushAndRemoveUntil(
@@ -57,7 +65,7 @@ if(orderInfo!['status']=='11'){
     });
   }
 
-  Completer<GoogleMapController> _controller = Completer();
+  final Completer<GoogleMapController> _controller = Completer();
   GoogleMapController? mapController;
   Set<Polyline> polylines = {};
 
@@ -92,13 +100,15 @@ if(orderInfo!['status']=='11'){
   Timer? _checkingTimer;
   @override
   void initState() {
+     
     orderInfo = widget.orderInfo;
-    _checkingTimer = Timer.periodic(Duration(seconds:orderInfo!['status']=='0'? 20:360), (Timer t) {
-      check();
+    _checkingTimer = Timer.periodic(Duration(seconds:checkTime), (Timer t) {
+      checkInternetConnection().then((value) => value == 1?  check():errono("تعذر الإتصال بالإنترنت",
+                    "Unable to connect to the Internet", context));
     });
     super.initState();
   }
-
+int checkTime=20;
   @override
   void dispose() {
     _checkingTimer!.cancel();
@@ -108,6 +118,7 @@ if(orderInfo!['status']=='11'){
 
   @override
   Widget build(BuildContext context) {
+    checkTime=orderInfo!['status']=='0'? 20:360;
     return Scaffold(
       body: Stack(
         children: [
@@ -159,8 +170,9 @@ if(orderInfo!['status']=='11'){
                       ),
                       Visibility(visible:   orderInfo!['status'] !='11',
                         child: GestureDetector(
-                            onTap: () {
-                              showCancelBottomSheet(context, orderInfo!['id'],Provider.of<VehicleTypeController>(context, listen: false).la);
+                            onTap: () async{
+                               var info = await DBProvider.db.getMe();
+                              showCancelBottomSheet(context, orderInfo!['id'],Provider.of<VehicleTypeController>(context, listen: false).la,info[0]);
                             },
                             child: Icon(
                               Icons.cancel_rounded,
@@ -190,132 +202,131 @@ if(orderInfo!['status']=='11'){
 
               child: Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Container(
-                    child: ListView(
-                  padding: EdgeInsets.only(top: 5),
+                child: ListView(
+                  padding: const EdgeInsets.only(top: 5),
                   children: [
-                    Visibility(
-                      visible: orderInfo!['provider_name'] != null,
-                      child:  GestureDetector(
-                          onTap:(){
-                                launch("tel://+966${orderInfo!['provider_phone']}");
-                              },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              orderInfo!['provider_name'] ?? '',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.headline6,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              orderInfo!['provider_phone'] ?? '',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.headline6,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.trip_origin,
-                          color: Colors.pink.shade200,
-                          size: 15,
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Column(
-                          children: [
-                            Text(context.watch<VehicleTypeController>().la?'نقطة البداية':
-                              'Pick-up address: ',
-                              style: Theme.of(context).textTheme.headline6,
-                              // textAlign: TextAlign.start,
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                    FittedBox(
-                        fit: BoxFit.contain,
-                        child: Text(
-                          orderInfo!['start_address'],
-                          overflow: TextOverflow.ellipsis,
-                        )),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          CommunityMaterialIcons.map_marker,
-                          color: Colors.pink.shade200,
-                          size: 15,
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(context.watch<VehicleTypeController>().la?"عنوان التسليم":
-                              'Drop-off address: ',
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-
-                            // FittedBox(
-                            //         fit: BoxFit.contain,child: Text(widget.orderInfo['end_address'],overflow: TextOverflow.ellipsis,)),
-                          ],
-                        )
-                      ],
-                    ),
-                    Text(
-                      orderInfo!['end_address'],
-                      textAlign: TextAlign.start,
-                      // style: Theme.of(context).textTheme.headline6,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Divider(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
+                Visibility(
+                  visible: orderInfo!['provider_name'] != null,
+                  child:  GestureDetector(
+                      onTap:(){
+                            launch("tel://+966${orderInfo!['provider_phone']}");
+                          },
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          orderInfo!['fee'] + ' ${context.watch<VehicleTypeController>().la?"ر.س":"SAR"} ',
+                          orderInfo!['provider_name'] ?? '',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.headline6,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          orderInfo!['distance'] + ' ${context.watch<VehicleTypeController>().la?"ك.م":"KM"} ',
+                          orderInfo!['provider_phone'] ?? '',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.headline6,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.trip_origin,
+                      color: Colors.pink.shade200,
+                      size: 15,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Column(
+                      children: [
+                        Text(context.watch<VehicleTypeController>().la?'نقطة البداية':
+                          'Pick-up address: ',
+                          style: Theme.of(context).textTheme.headline6,
+                          // textAlign: TextAlign.start,
+                        ),
+                      ],
+                    )
                   ],
-                )),
+                ),
+                FittedBox(
+                    fit: BoxFit.contain,
+                    child: Text(
+                      orderInfo!['start_address'],
+                      overflow: TextOverflow.ellipsis,
+                    )),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(
+                      CommunityMaterialIcons.map_marker,
+                      color: Colors.pink.shade200,
+                      size: 15,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(context.watch<VehicleTypeController>().la?"عنوان التسليم":
+                          'Drop-off address: ',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+
+                        // FittedBox(
+                        //         fit: BoxFit.contain,child: Text(widget.orderInfo['end_address'],overflow: TextOverflow.ellipsis,)),
+                      ],
+                    )
+                  ],
+                ),
+                Text(
+                  orderInfo!['end_address'],
+                  textAlign: TextAlign.start,
+                  // style: Theme.of(context).textTheme.headline6,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Divider(),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      orderInfo!['fee'] + ' ${context.watch<VehicleTypeController>().la?"ر.س":"SAR"} ',
+                      textAlign: TextAlign.start,
+                      style: Theme.of(context).textTheme.headline6,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      orderInfo!['distance'] + ' ${context.watch<VehicleTypeController>().la?"ك.م":"KM"} ',
+                      textAlign: TextAlign.start,
+                      style: Theme.of(context).textTheme.headline6,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(CupertinoIcons.location_north_line),
+        child: const Icon(CupertinoIcons.location_north_line),
         onPressed: () {
           setState(() {
             updateCameraLocation(

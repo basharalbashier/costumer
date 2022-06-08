@@ -1,4 +1,4 @@
-
+import 'package:costumer/helpers/create_me.dart';
 import 'package:costumer/helpers/replace_numbers.dart';
 import 'package:costumer/pages/check_page.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../controllers/Vehicle_tybe_controller.dart';
 import '../helpers/error_snack.dart';
 import '../helpers/gradiant_text.dart';
-
 
 import 'models/db.dart';
 
@@ -37,8 +36,6 @@ class _SignUpState extends State<SignUp> {
             //  Colors.blueGrey.shade900,
           ],
         )),
-
-        
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -46,14 +43,23 @@ class _SignUpState extends State<SignUp> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 30.0),
                 child: SizedBox(
-              child: Column(
-                children: [
-                  Image.asset('lib/assets/white.png'),
-                  Text( context.watch<VehicleTypeController>().la
-                          ? 'الإيميل '
-                          : 'Email',),
-                ],
-              ),
+                  child: Stack(
+                    children: [
+                      Image.asset('lib/assets/white.png'),
+                      Positioned(
+                        bottom: 0,
+                        left: MediaQuery.of(context).size.width / 2,
+                        child: Text(
+                          context.watch<VehicleTypeController>().la
+                              ? 'سعاة '
+                              : 'Suat',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: MediaQuery.of(context).size.width / 10),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Padding(
@@ -62,22 +68,30 @@ class _SignUpState extends State<SignUp> {
                   width: MediaQuery.of(context).size.width / 1.3,
                   child: TextField(
                     controller: name,
-                        textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
+                    textAlign: context.watch<VehicleTypeController>().la
+                        ? TextAlign.end
+                        : TextAlign.start,
                     decoration: InputDecoration(
-                      label:Row(mainAxisAlignment:context.watch<VehicleTypeController>().la? MainAxisAlignment.end:MainAxisAlignment.start,
-                        
+                      label: Row(
+                        mainAxisAlignment:
+                            context.watch<VehicleTypeController>().la
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
                         children: [
-                          Text(context.watch<VehicleTypeController>().la
-                              ? 'الإسم '
-                              : 'Name',textAlign:TextAlign.end ,),
+                          Text(
+                            context.watch<VehicleTypeController>().la
+                                ? 'الإسم '
+                                : 'Name',
+                            textAlign: TextAlign.end,
+                          ),
                         ],
-                      ) ,
+                      ),
                       labelStyle: const TextStyle(color: Colors.white),
-                      // labelText: 
+                      // labelText:
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white, width: 1.0),
                       ),
-                      enabledBorder:  const OutlineInputBorder(
+                      enabledBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                         borderSide: BorderSide(color: Colors.white, width: 1.0),
                       ),
@@ -87,31 +101,38 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              
               Padding(
-                padding: const  EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width / 1.3,
                   child: TextField(
-                      keyboardType: TextInputType.phone,
+                    keyboardType: TextInputType.phone,
                     controller: phone,
-                      //  textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
+                    //  textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
                     decoration: InputDecoration(
-                      label:Row(mainAxisAlignment:context.watch<VehicleTypeController>().la? MainAxisAlignment.end:MainAxisAlignment.start,
-                        
+                      label: Row(
+                        mainAxisAlignment:
+                            context.watch<VehicleTypeController>().la
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
                         children: [
-                          Text( context.watch<VehicleTypeController>().la
-                          ? 'رقم الهاتف'
-                          : 'Mobile Number',),
+                          Text(
+                            context.watch<VehicleTypeController>().la
+                                ? 'رقم الهاتف'
+                                : 'Mobile Number',
+                          ),
                         ],
-                      ) ,
-                      prefix: const Text('+966  ',style: TextStyle(color: Colors.white),),
-                        labelStyle: const TextStyle(color: Colors.white),
-             
-                     focusedBorder: const UnderlineInputBorder(
+                      ),
+                      prefix: const Text(
+                        '+966  ',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      labelStyle: const TextStyle(color: Colors.white),
+
+                      focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white, width: 1.0),
                       ),
-                    enabledBorder:  const OutlineInputBorder(
+                      enabledBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                         borderSide: BorderSide(color: Colors.white, width: 1.0),
                       ),
@@ -121,31 +142,34 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-             
-        
-             Padding(
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width / 1.3,
                   child: TextField(
                     keyboardType: TextInputType.emailAddress,
                     controller: email,
-            //  textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
+                    //  textAlign:context.watch<VehicleTypeController>().la? TextAlign.end:TextAlign.start,
                     decoration: InputDecoration(
-                      label:Row(mainAxisAlignment:context.watch<VehicleTypeController>().la? MainAxisAlignment.end:MainAxisAlignment.start,
-                        
+                      label: Row(
+                        mainAxisAlignment:
+                            context.watch<VehicleTypeController>().la
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
                         children: [
-                          Text( context.watch<VehicleTypeController>().la
-                          ? 'الإيميل '
-                          : 'Email',),
+                          Text(
+                            context.watch<VehicleTypeController>().la
+                                ? 'الإيميل '
+                                : 'Email',
+                          ),
                         ],
-                      ) ,
+                      ),
                       labelStyle: TextStyle(color: Colors.white),
-             
+
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white, width: 1.0),
                       ),
-                     enabledBorder:  const OutlineInputBorder(
+                      enabledBorder: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                         borderSide: BorderSide(color: Colors.white, width: 1.0),
                       ),
@@ -155,8 +179,6 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              
-             
               _getActionButtons()
             ],
           ),
@@ -191,12 +213,29 @@ class _SignUpState extends State<SignUp> {
                     setState(() {
                       val = !val;
                     });
-                    DBProvider.db.addMe([name.text, replaceArabicNumber(phone.text), email.text]);
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CheckPoint()),
-                      (Route<dynamic> route) => false,
-                    );
+                    createMe(context, [
+                      name.text,
+                      replaceArabicNumber(phone.text),
+                      email.text
+                    ]).then((value) {
+                      if (value != false) {
+                        DBProvider.db.addMe([
+                          value['super']['name'],
+                          replaceArabicNumber(phone.text),
+                          value['super']['email'],
+                          value['token']
+                        ]);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CheckPoint()),
+                          (Route<dynamic> route) => false,
+                        );
+                      } else {
+                        errono('حدث خطأ ما', "Oops! try again please", context);
+                      }
+                    });
+
                     // Get.to( AddDriver(9898989898));
                     // buy();
                   }
@@ -205,17 +244,17 @@ class _SignUpState extends State<SignUp> {
                 },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0)),
-                child: GradientText(context.watch<VehicleTypeController>().la == false
-                    ? "Confirm"
-                    : "تأكيد",
-                      gradient: LinearGradient(colors: [
-                                      Colors.pink.shade700,
-                                      Colors.purple.shade900,
-                                    ]),
-                                    // style: TextStyle(),
-                                    style: TextStyle(fontSize: 20,fontWeight: FontWeight.w900),
-                    
-                    ),
+                child: GradientText(
+                  context.watch<VehicleTypeController>().la == false
+                      ? "Confirm"
+                      : "تأكيد",
+                  gradient: LinearGradient(colors: [
+                    Colors.pink.shade700,
+                    Colors.purple.shade900,
+                  ]),
+                  // style: TextStyle(),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                ),
               ),
             ),
           ),
@@ -223,5 +262,4 @@ class _SignUpState extends State<SignUp> {
       ),
     );
   }
-
 }

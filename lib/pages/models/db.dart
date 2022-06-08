@@ -24,12 +24,11 @@ class DBProvider {
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute(
-          'CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, phone TEXT, email TEXT)');});
- 
+          'CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, phone TEXT, email TEXT, token TEXT)');
+    });
   }
 
-
-   Future getMe() async {
+  Future getMe() async {
     final db = await database;
     var result = await db.rawQuery("SELECT * FROM info  ");
     // WHERE job = '%${search}%' OR joba = '${search}' OR jobb = '${search}' OR jobc = '${search}' ORDER BY distance;
@@ -39,21 +38,20 @@ class DBProvider {
     return result;
   }
 
-  addMe( newPro) async {
+  addMe(newPro) async {
     final db = await database;
     db.rawDelete("Delete from info");
     var raw = await db.rawInsert(
-        "INSERT Into info (id,name,phone,email)"
-        " VALUES (?,?,?,?)",
+        "INSERT Into info (id,name,phone,email,token)"
+        " VALUES (?,?,?,?,?)",
         [
           1,
           newPro[0],
           newPro[1],
           newPro[2],
+          newPro[3],
         ]);
 
     return raw;
   }
-
-  }
-  
+}

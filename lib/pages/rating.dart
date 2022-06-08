@@ -4,13 +4,13 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import '../controllers/Vehicle_tybe_controller.dart';
+import '../helpers/constants.dart';
 import '../helpers/gradiant_text.dart';
-import '../main.dart';
 import 'check_page.dart';
 
 class RateProvider extends StatefulWidget {
-    var id;
-   RateProvider(this.id,{Key? key}) : super(key: key);
+  var id;
+  RateProvider(this.id, {Key? key}) : super(key: key);
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -154,7 +154,6 @@ class _MyAppState extends State<RateProvider> {
             child: Padding(
               padding: const EdgeInsets.only(right: 10.0),
               child: RaisedButton(
-               
                 color: Colors.white70,
                 onPressed: () async {
                   if (1 == 1) {
