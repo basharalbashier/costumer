@@ -4,7 +4,7 @@ import 'package:geocoding/geocoding.dart';
 Future<List> getCordinateInfo(double latitude, double longtude) async {
   List<String?> list = [];
 try{
-    await placemarkFromCoordinates(latitude, longtude).then((value) {
+  var value=  await placemarkFromCoordinates(latitude, longtude);
   
     list.add(value[0].isoCountryCode);
     list.add(value[0].locality);
@@ -12,12 +12,10 @@ try{
     list.add(value[0].thoroughfare);
     list.add(value[0].name);
 
-    // print(value);
-  });
+    return list;
+  
 }catch(e){
-if (kDebugMode) {
-  print(e);
+ return [];
 }
-}
-  return list;
+ 
 }

@@ -37,33 +37,33 @@ class _CheckPointState extends State<CheckPoint> {
     }
 
     return Scaffold(
-      body: Container(
+      body: 
+      Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.pink.shade700,
+        // decoration: BoxDecoration(
+        //     gradient: LinearGradient(
+        //   begin: Alignment.topCenter,
+        //   end: Alignment.bottomCenter,
+        //   colors: [
+        //     Colors.pink.shade700,
 
-            Colors.purple.shade900,
+        //     Colors.purple.shade900,
 
-            //  Colors.blueGrey.shade900,
-          ],
-        )),
+        //     //  Colors.blueGrey.shade900,
+        //   ],
+        // )),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Container(
-              child: Column(
-                children: [
-                  Image.asset('lib/assets/white.png'),
-                ],
-              ),
+            Column(
+              children: [
+                SizedBox(width: MediaQuery.of(context).size.width/1.2,
+                  child: Image.asset('lib/assets/colored.png')),
+              ],
             ),
             Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 10.0),
+                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 10.0),
                 child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,

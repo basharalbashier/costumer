@@ -6,6 +6,7 @@ import 'package:costumer/helpers/get_my_orders.dart';
 import 'package:costumer/helpers/gradiant_text.dart';
 import 'package:costumer/pages/models/colculating_distans.dart';
 import 'package:costumer/pages/models/colculating_fee.dart';
+import 'package:costumer/pages/models/db.dart';
 import 'package:costumer/widgets/drawer.dart';
 import 'package:costumer/widgets/poins_cards.dart';
 import 'package:costumer/widgets/vehicle_type.dart';
@@ -31,17 +32,29 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _key = GlobalKey();
-  List list = [];
+  List list = [{
+
+    'name':'name',
+     'namee':'namee',
+      'dis_ar':'name',
+       'dis_en':'name',
+        'kilo_price':'10.0',
+         'sec_price':'20.0',
+  }];
   getvehicle() {
     checkInternetConnection().then((value) => value == 1
         ? http.get(Uri.parse('${url}api/car'), headers: {
-               "Accept": "application/json",
-        }).then((value) {
-         
+            "Accept": "application/json",
+          }).then((value) {
             if (value.statusCode == 200 || value.statusCode == 201) {
-              setState(() {
+            List l =jsonDecode(value.body);
+            if(l.isNotEmpty){
+                 setState(() {
                 list = jsonDecode(value.body);
               });
+            }
+              // print( jsonDecode(value.body));
+             
             } else {
               errono("خطأ من مشغلاتنا، نعتذر", "Server error", context);
             }
@@ -56,6 +69,7 @@ class _HomeState extends State<Home> {
   void initState() {
     getMyOreders(widget.info, context);
     getvehicle();
+   
 
     super.initState();
   }
@@ -64,7 +78,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     if (wait) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator.adaptive()),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -122,7 +136,8 @@ class _HomeState extends State<Home> {
         leading: IconButton(
           icon: Icon(
             Icons.menu,
-            color: Colors.blueGrey.shade900,
+              color: Theme.of(context).colorScheme.primary,
+      
           ),
           onPressed: () => _key.currentState!.openDrawer(),
         ),
@@ -155,14 +170,22 @@ class _HomeState extends State<Home> {
                             .la)),
                 child: Icon(
                   Icons.language,
-                  color: Colors.blueGrey.shade900,
+                  color: Theme.of(context).colorScheme.primary,
+               
                 )),
           )
         ],
       ),
       body: ListView(
         children: <Widget>[
-          // const SlidingHeadings(),
+  
+          Visibility(
+            visible: widget.info['account']=='0'&& Provider.of<VehicleTypeController>(context, listen: false).finalFee=='0.00',
+            child: const SlidingHeadings()),
+
+
+
+
           PointsCard(widget.info),
           Visibility(
             visible: list.isNotEmpty,
@@ -198,11 +221,11 @@ class _HomeState extends State<Home> {
             setState(() {
               wait = !wait;
             });
-           
+
             checkInternetConnection().then((value) => value == 1
                 ? makeTrip(context, widget.info, choosenType).then((isItDone) =>
-                    Future.delayed(const Duration(seconds: 30))
-                        .then((value) => mounted && !isItDone
+                    Future.delayed(const Duration(microseconds: 1))
+                        .then((kjfsaghiJK) => mounted && !isItDone
                             ? {
                                 setState(() => wait = false),
                                 errono(
@@ -216,9 +239,10 @@ class _HomeState extends State<Home> {
           },
           label: Text(context.watch<VehicleTypeController>().la
               ? 'الى الرحلة'
-              : 'To the trip!'),
+              : 'To the trip!',style: const TextStyle( color: Colors.white,),),
           icon: const Icon(
             MdiIcons.tankerTruck,
+            color: Colors.white,
           ),
         ),
       ),

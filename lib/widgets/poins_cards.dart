@@ -1,4 +1,5 @@
 import 'package:community_material_icon/community_material_icon.dart';
+import 'package:costumer/helpers/gradiant_icon.dart';
 import 'package:costumer/pages/google_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -10,7 +11,7 @@ import '../controllers/Vehicle_tybe_controller.dart';
 
 class PointsCard extends StatefulWidget {
   var info;
-   PointsCard(this.info,{Key? key}) : super(key: key);
+  PointsCard(this.info, {Key? key}) : super(key: key);
 
   @override
   State<PointsCard> createState() => _PointsCardState();
@@ -35,33 +36,40 @@ class _PointsCardState extends State<PointsCard> {
                 child: Column(
                   // mainAxisSize: MainAxisSize.max,
                   // mainAxisAlignment: MainAxisAlignment.start,
-                  children:  <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.only(top:10.0),
-                      child: Icon(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(top: 10.0),
+                      child: GradientIcon(
                         Icons.trip_origin,
                         size: 20,
-                        color: Colors.pink,
+                        gradient: LinearGradient(colors: [
+                          Colors.pink.shade700,
+                         Theme.of(context).colorScheme.secondary
+                        ]),
                       ),
                     ),
-                for(int i=0; i<10;i++)
-                  const Icon(
-                      Icons.circle,
-                      size: 5,
-                    ),
-                   
-                   
-                    const Icon(
-                      CommunityMaterialIcons.map_marker,
-                      size: 25,
-                      color: Colors.pink,
-                    )
+                    for (int i = 0; i < MediaQuery.of(context).size.height/40; i++)
+                      Row(mainAxisAlignment: i.isEven?MainAxisAlignment.center:MainAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            size: 5,
+                            color:i.isEven? Theme.of(context).colorScheme.primary:Colors.white,
+                          ),
+                        ],
+                      ),
+                       GradientIcon(
+                        CommunityMaterialIcons.map_marker,
+                         size: 25,
+                        gradient: LinearGradient(colors: [
+                          Colors.pink.shade700,
+                         Theme.of(context).colorScheme.secondary
+                        ]),
+                      ),
+                 
                   ],
                 ),
               ),
-             
-             
-             
               Expanded(
                 flex: 8,
                 child: SingleChildScrollView(
@@ -75,7 +83,7 @@ class _PointsCardState extends State<PointsCard> {
                           children: [
                             Expanded(
                               child: GestureDetector(
-                                onTap: () => Get.to(() => Mapi(0,widget.info)),
+                                onTap: () => Get.to(() => Mapi(0, widget.info)),
                                 child: Text(
                                   context
                                           .watch<VehicleTypeController>()
@@ -102,11 +110,15 @@ class _PointsCardState extends State<PointsCard> {
                       const Divider(),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child:GestureDetector(
-                              onTap: () {
-                
-                                Provider.of<VehicleTypeController>(context, listen: false).firstPoint.isNotEmpty?Get.to(() => Mapi(1,widget.info)):null;
-                              } ,
+                        child: GestureDetector(
+                          onTap: () {
+                            Provider.of<VehicleTypeController>(context,
+                                        listen: false)
+                                    .firstPoint
+                                    .isNotEmpty
+                                ? Get.to(() => Mapi(1, widget.info))
+                                : null;
+                          },
                           child: Row(
                             mainAxisAlignment:
                                 context.watch<VehicleTypeController>().la
@@ -119,23 +131,23 @@ class _PointsCardState extends State<PointsCard> {
                                           .watch<VehicleTypeController>()
                                           .dropPoint
                                           .isEmpty
-                                      ? context.watch<VehicleTypeController>().la
+                                      ? context
+                                              .watch<VehicleTypeController>()
+                                              .la
                                           ? 'موقع الانزال'
                                           : 'Drop-off locaction'
                                       : context
                                           .watch<VehicleTypeController>()
                                           .dropPoint[0],
-                                       style: Theme.of(context).textTheme.headline6,
-                                   overflow: TextOverflow.fade,
-                                    textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headline6,
+                                  overflow: TextOverflow.fade,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                     
-                    
                     ],
                   ),
                 ),

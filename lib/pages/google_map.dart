@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
+import 'package:costumer/pages/models/db.dart';
 import 'package:costumer/pages/models/get_location.dart';
 import 'package:costumer/pages/models/get_points_info.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,13 +50,24 @@ class _MapiState extends State<Mapi> {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
-    var screenheight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       floatingActionButton: Padding(
         padding: EdgeInsets.only(right: screenWidth / 6),
         child: FloatingActionButton.extended(
           // extendedIconLabelSpacing:100.0,
           onPressed: () {
+            if (Provider.of<VehicleTypeController>(context, listen: false)
+                .dropPoint
+                .isNotEmpty) {
+              DBProvider.db.addPoint(
+                  Provider.of<VehicleTypeController>(context, listen: false)
+                      .dropPoint);
+            } else {
+              DBProvider.db.addPoint(
+                  Provider.of<VehicleTypeController>(context, listen: false)
+                      .firstPoint);
+            }
             if (Provider.of<VehicleTypeController>(context, listen: false)
                 .dropPoint
                 .isEmpty) {
@@ -72,13 +84,16 @@ class _MapiState extends State<Mapi> {
               width: screenWidth / 2,
               child: Center(
                   child: Text(
-                      context.watch<VehicleTypeController>().dropPoint.isEmpty
-                          ? context.watch<VehicleTypeController>().la
-                              ? 'الى نقطة النهاية'
-                              : 'End Point'
-                          : context.watch<VehicleTypeController>().la
-                              ? 'الى النقل'
-                              : 'To the trip!'))),
+                context.watch<VehicleTypeController>().dropPoint.isEmpty
+                    ? context.watch<VehicleTypeController>().la
+                        ? 'الى نقطة النهاية'
+                        : 'End Point'
+                    : context.watch<VehicleTypeController>().la
+                        ? 'الى النقل'
+                        : 'To the trip!',
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w900),
+              ))),
           // icon: const Icon(Icons.delivery_dining),
         ),
       ),
@@ -108,7 +123,6 @@ class _MapiState extends State<Mapi> {
                           Marker marker = _markers[markerId]!;
                           Marker updatedMarker = marker.copyWith(
                             positionParam: position.target,
-                            
                           );
 
                           setState(() {
@@ -120,30 +134,18 @@ class _MapiState extends State<Mapi> {
                                   ? context
                                       .read<VehicleTypeController>()
                                       .setFirstPoint([
-                                      fullAdress[0] +
-                                          ', ' +
-                                          fullAdress[1] +
-                                          ', ' +
-                                          fullAdress[2] +
-                                          ',' +
-                                          fullAdress[3] +
-                                          ',' +
-                                          fullAdress[4],
+                                      fullAdress.isNotEmpty
+                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}, ${fullAdress[4]}'
+                                          : '',
                                       position.target.latitude.toString(),
                                       position.target.longitude.toString()
                                     ])
                                   : context
                                       .read<VehicleTypeController>()
                                       .setDropPoint([
-                                      fullAdress[0] +
-                                          ', ' +
-                                          fullAdress[1] +
-                                          ', ' +
-                                          fullAdress[2] +
-                                          ',' +
-                                          fullAdress[3] +
-                                          ',' +
-                                          fullAdress[4],
+                                      fullAdress.isNotEmpty
+                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}, ${fullAdress[4]}'
+                                          : '',
                                       position.target.latitude.toString(),
                                       position.target.longitude.toString()
                                     ]);
@@ -170,8 +172,6 @@ class _MapiState extends State<Mapi> {
                     // ],
                   ),
                   width: screenWidth - 20,
-                 
-
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -183,23 +183,13 @@ class _MapiState extends State<Mapi> {
                           // flex: 5,
                           child: Padding(
                             padding: const EdgeInsets.only(left: 8.0),
-                            child: Container(
-                              child: FittedBox(
-                                fit: BoxFit.contain,
-                                child: Text(
-                                  fullAdress.isEmpty
-                                      ? ''
-                                      : fullAdress[0] +
-                                          ', ' +
-                                          fullAdress[1] +
-                                          ', ' +
-                                          fullAdress[2] +
-                                          ' ,' +
-                                          fullAdress[3] +
-                                          ' ,' +
-                                          fullAdress[4],
-                                  // style: Theme.of(context).textTheme.headline6,
-                                ),
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(
+                                 fullAdress.isNotEmpty
+                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}, ${fullAdress[4]}'
+                                          : ''
+                                // style: Theme.of(context).textTheme.headline6,
                               ),
                             ),
                           ),
@@ -230,13 +220,15 @@ class _MapiState extends State<Mapi> {
         _markers[markerId] = marker;
       });
 
-      Future.delayed(Duration(seconds: 2), () async {
+      Future.delayed(const Duration(seconds: 2), () async {
         GoogleMapController controller = await _controller.future;
-        setState(() {
-          getCordinateInfo(position.latitude, position.longitude)
-              .then((value) => fullAdress = value);
-          // _markers[markerId] = marker;
-        });
+        if (mounted) {
+          setState(() {
+            getCordinateInfo(position.latitude, position.longitude)
+                .then((value) => fullAdress = value);
+            // _markers[markerId] = marker;
+          });
+        }
         controller.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(

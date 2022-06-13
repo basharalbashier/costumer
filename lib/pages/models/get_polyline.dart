@@ -48,7 +48,7 @@ class Linestring {
 }
 
 
-  Future<Set<Polyline>>  getPolyLine(LatLng a, LatLng b) async {
+  Future<Set<Polyline>>  getPolyLine(LatLng a, LatLng b,context) async {
     NetworkHelper network = NetworkHelper(
       startLat: a.latitude,
       startLng: a.longitude,
@@ -58,27 +58,27 @@ class Linestring {
 
       final List<LatLng> polypoints = [];
        final Set<Polyline> polylines = {};
-       print('im');
+   
     try {
       // getdata() returns a json decoded data
-      // var data = await network.getData();
+      var data = await network.getData();
       // we can reach to our desired json data manually as following
-      // Linestring ls =
-      //     Linestring(data['features'][0]['geometry']['coordinates']);
-      // for (int i = 0; i < ls.linestring.length; i++) {
-      //   polypoints.add(LatLng(ls.linestring[i][1], ls.linestring[i][0]));
-      // }
-      // if (polypoints.length == ls.linestring.length) {
-      //   setState(() {
-      //     d = '${((double.parse('${data['features'][0]['properties']['summary']['distance']}') / 1000).toStringAsFixed(1))}/Km';
-      //   });
+      Linestring ls =
+          Linestring(data['features'][0]['geometry']['coordinates']);
+      for (int i = 0; i < ls.linestring.length; i++) {
+        polypoints.add(LatLng(ls.linestring[i][1], ls.linestring[i][0]));
+      }
+      if (polypoints.length == ls.linestring.length) {
+        // setState(() {
+        //   d = '${((double.parse('${data['features'][0]['properties']['summary']['distance']}') / 1000).toStringAsFixed(1))}/Km';
+        // });
      
-      // }
+      }
 
           Polyline polyline = Polyline(
       width: 3,
-      polylineId: PolylineId("polyline"),
-      color: Colors.pink,
+      polylineId: const PolylineId("polyline"),
+      color: Theme.of(context).colorScheme.secondary,
       points: polypoints,
     );
         polylines.add(polyline);

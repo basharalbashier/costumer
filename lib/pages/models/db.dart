@@ -24,7 +24,13 @@ class DBProvider {
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute(
-          'CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, phone TEXT, email TEXT, token TEXT)');
+          'CREATE TABLE info (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, phone TEXT, email TEXT, account TEXT, token TEXT)');
+
+      await db.execute(
+          'CREATE TABLE stores (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, comments TEXT, address TEXT, late TEXT, longe TEXT)');
+
+      await db.execute(
+          'CREATE TABLE locations (id INTEGER PRIMARY KEY AUTOINCREMENT, address TEXT, late TEXT, longe TEXT)');
     });
   }
 
@@ -37,21 +43,59 @@ class DBProvider {
 
     return result;
   }
+  Future getPoints() async {
+    final db = await database;
+    var result = await db.rawQuery("SELECT * FROM locations  ");
+    // WHERE job = '%${search}%' OR joba = '${search}' OR jobb = '${search}' OR jobc = '${search}' ORDER BY distance;
+    // print(result[0]);
+    if (result.isEmpty) return 0;
 
-  addMe(newPro) async {
+    return result;
+  }
+  addMe(Map newPro) async {
     final db = await database;
     db.rawDelete("Delete from info");
     var raw = await db.rawInsert(
-        "INSERT Into info (id,name,phone,email,token)"
-        " VALUES (?,?,?,?,?)",
+        "INSERT Into info (id,name,phone,email,account,token)"
+        " VALUES (?,?,?,?,?,?)",
         [
-          1,
-          newPro[0],
-          newPro[1],
-          newPro[2],
-          newPro[3],
+           newPro['id'],
+          newPro['name'],
+          newPro['phone'],
+          newPro['email'],
+          newPro['account'],
+          newPro['token'],
         ]);
 
     return raw;
   }
+
+ addPoint(List<String> newPoint) async {
+    final db = await database;
+
+      var result = await db.rawQuery(
+        "SELECT * FROM locations WHERE late LIKE '%${newPoint[1]}%' AND longe LIKE '%${  newPoint[2]}%'  ");
+   if(result.isEmpty){
+
+     await db.rawInsert(
+        "INSERT Into locations (address,late,longe)"
+        " VALUES (?,?,?)",
+        [
+          
+          newPoint[0],
+          newPoint[1],
+          newPoint[2],
+        
+        ]);
+
+   }else{
+    print(result);
+   }
+   
+    
+
+    // return raw;
+  }
+
+
 }

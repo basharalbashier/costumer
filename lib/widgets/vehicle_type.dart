@@ -6,6 +6,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/gradiant_icon.dart';
+
 class VehicleType extends StatefulWidget {
   var vehicle;
   int? index;
@@ -45,7 +47,7 @@ class _VehicleTypeState extends State<VehicleType> {
                       BoxShadow(
                           color: context.watch<VehicleTypeController>().count ==
                                   widget.index
-                              ? Colors.pink
+                              ? Theme.of(context).colorScheme.secondary
                               : Colors.grey,
                           spreadRadius: 2),
                     ],
@@ -55,18 +57,25 @@ class _VehicleTypeState extends State<VehicleType> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Icon(
-                          MdiIcons.tankerTruck,
+                      
+                       Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: 
+                          GradientIcon(
+                             MdiIcons.tankerTruck,
                           size: 50,
-                        ),
+                        gradient: LinearGradient(colors: [
+                          Colors.pink.shade700,
+                         Theme.of(context).colorScheme.secondary
+                        ]),
+                      ),
+                    
                       ),
                       Flexible(
                         child: ListTile(
-                            trailing: SizedBox(width: 55,
+                            trailing: SizedBox(
+                              width: 55,
                               child: Text(
-                                
                                 context
                                             .watch<VehicleTypeController>()
                                             .finalFeeData ==
@@ -91,9 +100,8 @@ class _VehicleTypeState extends State<VehicleType> {
                                         .watch<VehicleTypeController>()
                                         .count ==
                                     widget.index,
-                                child: Text(
-                                  context
-                                      .watch<VehicleTypeController>()
+                                child: Text(context
+                                        .watch<VehicleTypeController>()
                                         .la
                                     ? widget.vehicle['cap_ar'].toString()
                                     : widget.vehicle['cap_en'].toString()))),
@@ -104,14 +112,14 @@ class _VehicleTypeState extends State<VehicleType> {
               ),
             ),
             Positioned(
-                right: 20,
-                top: 12,
+                right: 18,
+                top: 14,
                 child: Visibility(
                   visible: context.watch<VehicleTypeController>().count ==
                       widget.index,
                   child: Icon(
                     Icons.check_circle,
-                    color: Colors.pink,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                 ))
           ],

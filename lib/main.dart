@@ -11,9 +11,6 @@ import 'package:provider/provider.dart';
 
 import 'helpers/http_override.dart';
 
-
-
-
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -21,7 +18,7 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-    HttpOverrides.global = MyHttpOverrides();
+  HttpOverrides.global = MyHttpOverrides();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -30,7 +27,7 @@ void main() {
     ],
     child: GetMaterialApp(
       debugShowCheckedModeBanner: false,
-         theme: _buildShrineTheme(),
+      theme: _buildShrineTheme(),
       // theme: ThemeData(
       //   fontFamily: 'Cairo',
       //   primarySwatch: Colors.blueGrey,
@@ -39,6 +36,7 @@ void main() {
     ),
   ));
 }
+
 ThemeData _buildShrineTheme() {
   final ThemeData base = ThemeData.light();
   return base.copyWith(
@@ -50,6 +48,7 @@ ThemeData _buildShrineTheme() {
     cardColor: shrineBackgroundWhite,
     textSelectionColor: shrinePink100,
     errorColor: shrineErrorRed,
+    checkboxTheme: _customCheckboxTheme(base.checkboxTheme),
     buttonTheme: const ButtonThemeData(
       colorScheme: _shrineColorScheme,
       textTheme: ButtonTextTheme.normal,
@@ -64,6 +63,11 @@ ThemeData _buildShrineTheme() {
 
 IconThemeData _customIconTheme(IconThemeData original) {
   return original.copyWith(color: shrineBrown900);
+}
+
+CheckboxThemeData? _customCheckboxTheme(CheckboxThemeData original) {
+  return original.copyWith(
+      fillColor: MaterialStateProperty.resolveWith((states) => shrineBrown900));
 }
 
 TextTheme _buildShrineTextTheme(TextTheme base) {
@@ -82,8 +86,8 @@ TextTheme _buildShrineTextTheme(TextTheme base) {
       )
       .apply(
         fontFamily: 'Cairo',
-        displayColor: shrineBrown900,
-        bodyColor: shrineBrown900,
+        // displayColor: shrineBrown900,
+        // bodyColor: shrineBrown900,
       );
 }
 
@@ -103,10 +107,10 @@ const ColorScheme _shrineColorScheme = ColorScheme(
   brightness: Brightness.light,
 );
 
-const Color shrinePink50 = Color(0xFFFEEAE6);
-const Color shrinePink100 = Color(0xFFFEDBD0);
-const Color shrinePink300 = Color(0xFFFBB8AC);
-const Color shrinePink400 = Color(0xFFEAA4A4);
+const Color shrinePink50 = Color.fromARGB(255, 132, 3, 115);
+const Color shrinePink100 = Color.fromARGB(255, 59, 0, 78);
+const Color shrinePink300 = Color.fromARGB(255, 59, 0, 78);
+const Color shrinePink400 = Color.fromARGB(255, 59, 0, 78);
 
 const Color shrineBrown900 = Color(0xFF442B2D);
 const Color shrineBrown600 = Color(0xFF7D4F52);
