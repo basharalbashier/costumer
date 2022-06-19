@@ -32,29 +32,30 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _key = GlobalKey();
-  List list = [{
-
-    'name':'name',
-     'namee':'namee',
-      'dis_ar':'name',
-       'dis_en':'name',
-        'kilo_price':'10.0',
-         'sec_price':'20.0',
-  }];
+  List list = [
+    {
+      'name': 'name',
+      'namee': 'namee',
+      'dis_ar': 'name',
+      'dis_en': 'name',
+      'kilo_price': '10.0',
+      'sec_price': '20.0',
+    }
+  ];
   getvehicle() {
     checkInternetConnection().then((value) => value == 1
         ? http.get(Uri.parse('${url}api/car'), headers: {
             "Accept": "application/json",
           }).then((value) {
             if (value.statusCode == 200 || value.statusCode == 201) {
-            List l =jsonDecode(value.body);
-            if(l.isNotEmpty){
-                 setState(() {
-                list = jsonDecode(value.body);
-              });
-            }
+              List l = jsonDecode(value.body);
+              if (l.isNotEmpty) {
+                setState(() {
+                  list = jsonDecode(value.body);
+                });
+              }
               // print( jsonDecode(value.body));
-             
+
             } else {
               errono("خطأ من مشغلاتنا، نعتذر", "Server error", context);
             }
@@ -65,11 +66,11 @@ class _HomeState extends State<Home> {
 
   bool wait = false;
   var choosenType;
+  var comment=TextEditingController();
   @override
   void initState() {
     getMyOreders(widget.info, context);
     getvehicle();
-   
 
     super.initState();
   }
@@ -136,8 +137,7 @@ class _HomeState extends State<Home> {
         leading: IconButton(
           icon: Icon(
             Icons.menu,
-              color: Theme.of(context).colorScheme.primary,
-      
+            color: Theme.of(context).colorScheme.primary,
           ),
           onPressed: () => _key.currentState!.openDrawer(),
         ),
@@ -171,22 +171,77 @@ class _HomeState extends State<Home> {
                 child: Icon(
                   Icons.language,
                   color: Theme.of(context).colorScheme.primary,
-               
                 )),
           )
         ],
       ),
       body: ListView(
         children: <Widget>[
-  
           Visibility(
-            visible: widget.info['account']=='0'&& Provider.of<VehicleTypeController>(context, listen: false).finalFee=='0.00',
-            child: const SlidingHeadings()),
-
-
-
-
+              visible: widget.info['account'] == '0' &&
+                  Provider.of<VehicleTypeController>(context, listen: false)
+                          .finalFee ==
+                      '0.00',
+              child: const SlidingHeadings()),
+          
           PointsCard(widget.info),
+
+
+           Visibility(
+              visible:
+                  Provider.of<VehicleTypeController>(context, listen: false)
+                          .finalFee !=
+                      '0.00',
+              child:  Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      comment.text=value;
+                    });
+                    
+                  },
+                 textAlign: context.watch<VehicleTypeController>().la
+                          ? TextAlign.end
+                          : TextAlign.start,
+                  keyboardType: TextInputType.multiline,
+              
+                  maxLines: 2,
+                     decoration: InputDecoration(
+                          label: Row(
+                            mainAxisAlignment:
+                                context.watch<VehicleTypeController>().la
+                                    ? MainAxisAlignment.end
+                                    : MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.watch<VehicleTypeController>().la
+                                    ? 'اضف تعليق'
+                                    : 'Add a comment',
+                              ),
+                            ],
+                          ),
+
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(width: 2.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2.0),
+                          ),
+                          //  alignLabelWithHint:true ,
+                          //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
+                        ),
+                      
+                  
+                ),
+              )),
+        
+
+
           Visibility(
             visible: list.isNotEmpty,
             child: Padding(
@@ -205,7 +260,8 @@ class _HomeState extends State<Home> {
               ),
             ),
           ),
-          for (int i = 1; i <= list.length; i++) VehicleType(list[i - 1], i)
+          for (int i = 1; i <= list.length; i++) VehicleType(list[i - 1], i),
+        
         ],
       ),
       floatingActionButton: Visibility(
@@ -223,7 +279,7 @@ class _HomeState extends State<Home> {
             });
 
             checkInternetConnection().then((value) => value == 1
-                ? makeTrip(context, widget.info, choosenType).then((isItDone) =>
+                ? makeTrip(context, widget.info, choosenType,comment.text).then((isItDone) =>
                     Future.delayed(const Duration(microseconds: 1))
                         .then((kjfsaghiJK) => mounted && !isItDone
                             ? {
@@ -237,9 +293,14 @@ class _HomeState extends State<Home> {
                 : errono("تعذر الإتصال بالإنترنت",
                     "Unable to connect to the Internet", context));
           },
-          label: Text(context.watch<VehicleTypeController>().la
-              ? 'الى الرحلة'
-              : 'To the trip!',style: const TextStyle( color: Colors.white,),),
+          label: Text(
+            context.watch<VehicleTypeController>().la
+                ? 'الى الرحلة'
+                : 'To the trip!',
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
           icon: const Icon(
             MdiIcons.tankerTruck,
             color: Colors.white,

@@ -1,6 +1,7 @@
 import 'package:costumer/helpers/create_me.dart';
 import 'package:costumer/helpers/replace_numbers.dart';
 import 'package:costumer/pages/check_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +26,7 @@ class _SignUpState extends State<SignUp> {
   bool val = true;
   @override
   Widget build(BuildContext context) {
+   
     if (!val) {
       return const Scaffold(
         body: Center(
@@ -202,6 +204,7 @@ class _SignUpState extends State<SignUp> {
                         //  alignLabelWithHint:true ,
                         //  hintText:context.watch<VehicleTypeController>().la?'رقم الهاتف': 'Mobile Number',
                       ),
+                    
                     ),
                   ),
                 ),
@@ -271,8 +274,13 @@ class _SignUpState extends State<SignUp> {
                             ],
                             account)
                         .then((value) {
-                          print(value);
-                      if (value != false) {
+                       
+                       if(value==202){
+                        if (kDebugMode) {
+                          print('old app');
+                        }
+                       }
+                      if (value['super']['phone']==replaceArabicNumber(phone.text) && value!=202) {
                         DBProvider.db.addMe({
                           'id': value['super']['id'],
                           'name': value['super']['name'],
@@ -287,11 +295,16 @@ class _SignUpState extends State<SignUp> {
                               builder: (context) => const CheckPoint()),
                           (Route<dynamic> route) => false,
                         );
-                      } else {
-                        setState(() {
+                      } 
+                      if(value==false){
+                         setState(() {
                           val = !val;
                         });
                       }
+                      
+                  
+                       
+                 
                     });
 
                     // Get.to( AddDriver(9898989898));

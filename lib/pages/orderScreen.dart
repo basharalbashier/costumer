@@ -18,6 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../helpers/check_internet.dart';
 import '../helpers/constants.dart';
 import '../helpers/error_snack.dart';
+import 'check_page.dart';
 import 'models/db.dart';
 import 'models/retun_icon.dart';
 
@@ -30,39 +31,63 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  Map? orderInfo;
+  Map orderInfo = {};
   check() async {
     var info = await DBProvider.db.getMe();
-    await http.get(Uri.parse('${url}api/orders/${widget.orderInfo['id']}'),
-        headers: {
-          "Accept": "application/json",
-          'Authorization': 'Bearer ${info[0]['token']}'
-        }).then((value) {
-      if (mounted) {
-        setState(() {
-          orderInfo = jsonDecode(value.body);
-        });
-        Provider.of<VehicleTypeController>(context, listen: false)
-            .statusUpdate(orderInfo!['status']);
-      }
+    try {
+      await http.get(Uri.parse('${url}api/orders/${widget.orderInfo['id']}'),
+          headers: {
+            "Accept": "application/json",
+            'Authorization': 'Bearer ${info[0]['token']}'
+          }).then((value) {
+        if (jsonDecode(value.body)['status'] == '4') {
+          errono("تم إلغاء الشحن من قبل الإدارة",
+              "Shipping has been canceled by management", context);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const CheckPoint()),
+            (Route<dynamic> route) => false,
+          );
+        }
+        if (jsonDecode(value.body)['status'] == '5') {
+          errono("قام السائق بإلغاء الشحن", "The driver canceled the shipping",
+              context);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const CheckPoint()),
+            (Route<dynamic> route) => false,
+          );
+        }
+        if (mounted) {
+          setState(() {
+            orderInfo = jsonDecode(value.body);
+            Provider.of<VehicleTypeController>(context, listen: false)
+                .statusUpdate(orderInfo['status']);
+          });
+        }
 
-      if (orderInfo!['status'] == '11') {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => RateProvider(orderInfo!['id'])),
-          (Route<dynamic> route) => false,
-        );
-      }
-      if (kDebugMode) {
-        // print(jsonDecode(value.body));
-      }
-      // for (var i in list) {
-      //   if (kDebugMode) {
-      //     print(i);
-      //   }
-      // }
-    });
+        if (orderInfo['status'] == '11') {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => RateProvider(orderInfo['id'])),
+            (Route<dynamic> route) => false,
+          );
+        }
+        if (kDebugMode) {
+          // print(jsonDecode(value.body));
+        }
+        // for (var i in list) {
+        //   if (kDebugMode) {
+        //     print(i);
+        //   }
+        // }
+      });
+    } catch (error) {
+      // ignore: use_build_context_synchronously
+      errono("تعذر الإتصال بالإنترنت", "Unable to connect to the Internet",
+          context);
+    }
   }
 
   final Completer<GoogleMapController> _controller = Completer();
@@ -71,25 +96,27 @@ class _OrderScreenState extends State<OrderScreen> {
 
   setpolylines() {
     getPolyLine(
-        LatLng(
-          double.parse(orderInfo!['start_late']),
-          double.parse(orderInfo!['start_longe']),
-        ),
-        LatLng(
-          double.parse(orderInfo!['end_late']),
-          double.parse(orderInfo!['end_longe']),
-        ),context).then((value) {
+            LatLng(
+              double.parse(orderInfo['start_late']),
+              double.parse(orderInfo['start_longe']),
+            ),
+            LatLng(
+              double.parse(orderInfo['end_late']),
+              double.parse(orderInfo['end_longe']),
+            ),
+            context)
+        .then((value) {
       if (mounted) {
         setState(() {
           polylines = value;
           updateCameraLocation(
               LatLng(
-                double.parse(orderInfo!['start_late']),
-                double.parse(orderInfo!['start_longe']),
+                double.parse(orderInfo['start_late']),
+                double.parse(orderInfo['start_longe']),
               ),
               LatLng(
-                double.parse(orderInfo!['end_late']),
-                double.parse(orderInfo!['end_longe']),
+                double.parse(orderInfo['end_late']),
+                double.parse(orderInfo['end_longe']),
               ),
               mapController!);
         });
@@ -118,9 +145,11 @@ class _OrderScreenState extends State<OrderScreen> {
     super.dispose();
   }
 
+  final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
+
   @override
   Widget build(BuildContext context) {
-    checkTime = orderInfo!['status'] == '0' ? 20 : 360;
+    checkTime = orderInfo['status'] == '0' ? 20 : 360;
     return Scaffold(
       body: Stack(
         children: [
@@ -130,10 +159,10 @@ class _OrderScreenState extends State<OrderScreen> {
               // onTap: (o) {
               //   print(o);
               // },
-              // markers: Set<Marker>.of(_markers.values),
+              markers: Set<Marker>.of(_markers.values),
               initialCameraPosition: CameraPosition(
-                target: LatLng(double.parse(orderInfo!['start_late']),
-                    double.parse(orderInfo!['start_longe'])),
+                target: LatLng(double.parse(orderInfo['start_late']),
+                    double.parse(orderInfo['start_longe'])),
                 zoom: 10.0,
               ),
               onMapCreated: _onMapCreated,
@@ -171,13 +200,13 @@ class _OrderScreenState extends State<OrderScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: orderInfo!['status'] != '11',
+                        visible: orderInfo['status'] != '11',
                         child: GestureDetector(
                             onTap: () async {
                               var info = await DBProvider.db.getMe();
                               showCancelBottomSheet(
                                   context,
-                                  orderInfo!['id'],
+                                  orderInfo['id'],
                                   Provider.of<VehicleTypeController>(context,
                                           listen: false)
                                       .la,
@@ -215,22 +244,22 @@ class _OrderScreenState extends State<OrderScreen> {
                   padding: const EdgeInsets.only(top: 5),
                   children: [
                     Visibility(
-                      visible: orderInfo!['provider_name'] != null,
+                      visible: orderInfo['provider_name'] != null,
                       child: GestureDetector(
                         onTap: () {
-                          launch("tel://+966${orderInfo!['provider_phone']}");
+                          launch("tel://+966${orderInfo['provider_phone']}");
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                              orderInfo!['provider_name'] ?? '',
+                              orderInfo['provider_name'] ?? '',
                               textAlign: TextAlign.start,
                               style: Theme.of(context).textTheme.headline6,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              orderInfo!['provider_phone'] ?? '',
+                              orderInfo['provider_phone'] ?? '',
                               textAlign: TextAlign.start,
                               style: Theme.of(context).textTheme.headline6,
                               overflow: TextOverflow.ellipsis,
@@ -275,7 +304,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     FittedBox(
                         fit: BoxFit.contain,
                         child: Text(
-                          orderInfo!['start_address'],
+                          orderInfo['start_address'],
                           overflow: TextOverflow.ellipsis,
                         )),
                     const SizedBox(
@@ -316,7 +345,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       ],
                     ),
                     Text(
-                      orderInfo!['end_address'],
+                      orderInfo['end_address'],
                       textAlign: TextAlign.start,
                       // style: Theme.of(context).textTheme.headline6,
                       overflow: TextOverflow.ellipsis,
@@ -332,14 +361,14 @@ class _OrderScreenState extends State<OrderScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          orderInfo!['fee'] +
+                          orderInfo['fee'] +
                               ' ${context.watch<VehicleTypeController>().la ? "ر.س" : "SAR"} ',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.headline6,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          orderInfo!['distance'] +
+                          orderInfo['distance'] +
                               ' ${context.watch<VehicleTypeController>().la ? "ك.م" : "KM"} ',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.headline6,
@@ -363,12 +392,12 @@ class _OrderScreenState extends State<OrderScreen> {
           setState(() {
             updateCameraLocation(
                 LatLng(
-                  double.parse(orderInfo!['start_late']),
-                  double.parse(orderInfo!['start_longe']),
+                  double.parse(orderInfo['start_late']),
+                  double.parse(orderInfo['start_longe']),
                 ),
                 LatLng(
-                  double.parse(orderInfo!['end_late']),
-                  double.parse(orderInfo!['end_longe']),
+                  double.parse(orderInfo['end_late']),
+                  double.parse(orderInfo['end_longe']),
                 ),
                 mapController!);
           });
@@ -382,6 +411,38 @@ class _OrderScreenState extends State<OrderScreen> {
     _controller.complete(controller);
     await _controller.future;
     setpolylines();
+      final Marker marker = Marker(
+           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
+        markerId: const MarkerId('0'),
+        position: LatLng(
+          double.parse(orderInfo['start_late']),
+          double.parse(orderInfo['start_longe']),
+        ),
+        infoWindow: InfoWindow(
+            title: Provider.of<VehicleTypeController>(context, listen: false).la
+                ? "نقطة الشحن"
+                : "Shipping location"),
+        onTap: () {},
+      );
+      final Marker markerTwo = Marker(
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
+        markerId: const MarkerId('1'),
+        position: LatLng(
+          double.parse(orderInfo['end_late']),
+          double.parse(orderInfo['end_longe']),
+        ),
+        infoWindow: InfoWindow(
+            title: Provider.of<VehicleTypeController>(context, listen: false).la
+                ? "نقطة التوصيل"
+                : "Drop location"),
+        onTap: () {},
+      );
+
+      setState(() {
+        // adding a new marker to map
+        _markers[const MarkerId('0')] = marker;
+        _markers[const MarkerId('1')] = markerTwo;
+      });
   }
 
   Future<void> updateCameraLocation(

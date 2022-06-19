@@ -31,7 +31,9 @@ class NetworkHelper {
     // //     "$url$journeyMode?$apiKey&start=$startLng,$startLat&end=$endLng,$endLat");
     // if (response.statusCode == 200) {
     //   String data = response.body;
-    //   print(data);
+    //   if (kDebugMode) {
+    //     print(data);
+    //   }
     //   // print(jsonDecode(data)['features'][0]['properties']['summary']);
 
     //   return jsonDecode(data);

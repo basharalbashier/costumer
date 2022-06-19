@@ -140,7 +140,7 @@ class _VehicleTypeState extends State<VehicleType> {
               height: 100,
               child: Center(
                   child: Text(
-                context.watch<VehicleTypeController>().la
+                !context.watch<VehicleTypeController>().la
                     ? widget.vehicle['dis_ar']
                     : widget.vehicle['dis_en'],
                 style: Theme.of(context).textTheme.caption,

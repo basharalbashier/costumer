@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../controllers/Vehicle_tybe_controller.dart';
 
 Widget statusIcon(String status, la) {
-  print(status + 'ddddddddddddd');
+
 
   switch (status) {
     case '7':

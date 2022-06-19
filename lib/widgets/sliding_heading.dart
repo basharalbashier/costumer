@@ -17,9 +17,11 @@ class _SlidingHeadingsState extends State<SlidingHeadings> {
   List pointsList=[];
   getData()async{
     var points=await DBProvider.db.getPoints();
-   setState(() {
+  if(points!=0){
+     setState(() {
      pointsList=points;   
    });
+  }
   }
   @override
   void initState() {

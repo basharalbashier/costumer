@@ -9,16 +9,17 @@ import '../controllers/Vehicle_tybe_controller.dart';
 import '../pages/orderScreen.dart';
 import 'constants.dart';
 
-Future<bool> makeTrip(context, info, choosenType) async {
+Future<bool> makeTrip(context, info, choosenType,comment) async {
   http.Response respons;
 
   try {
-    respons = await http.post(Uri.parse('${url}api/orders'), headers: {
+    respons = await http.post(Uri.parse('${url}api/orders/add'), headers: {
       "Accept": "application/json",
       'Authorization': 'Bearer ${info['token']}'
     }, body: {
       'user_name': info['name'],
       'user_phone': info['phone'],
+      'user_comment':comment,
       'start_address':
           Provider.of<VehicleTypeController>(context, listen: false)
               .firstPoint[0],
@@ -39,13 +40,12 @@ Future<bool> makeTrip(context, info, choosenType) async {
           .distanceData,
       'status': '0',
     });
+  
     if ((respons.statusCode == 200 || respons.statusCode == 201) &&
         Provider.of<VehicleTypeController>(context, listen: false)
                 .firstPoint[1] ==
             jsonDecode(respons.body)['start_late']) {
-      if (kDebugMode) {
-        print(jsonDecode(respons.body)['start_late']);
-      }
+   
       Map i = jsonDecode(respons.body);
       Navigator.pushAndRemoveUntil(
         context,
