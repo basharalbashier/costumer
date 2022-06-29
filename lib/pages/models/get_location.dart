@@ -1,6 +1,7 @@
+import 'package:costumer/helpers/error_snack.dart';
 import 'package:geolocator/geolocator.dart';
 
-Future<Position> getlocation() async {
+Future<Position> getlocation(context) async {
   bool serviceEnabled;
   LocationPermission permission;
 
@@ -28,6 +29,7 @@ Future<Position> getlocation() async {
   
   if (permission == LocationPermission.deniedForever) {
     // Permissions are denied forever, handle appropriately. 
+    errono('تحديد الموقع موقف حالياً، رجاء قم بتفعيله لتحديد النقطة', 'Location is currently suspended, please enable it to locate the point', context);
     return Future.error(
       'Location permissions are permanently denied, we cannot request permissions.');
   } 

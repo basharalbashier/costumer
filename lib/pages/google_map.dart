@@ -4,6 +4,7 @@ import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
 import 'package:costumer/pages/models/db.dart';
 import 'package:costumer/pages/models/get_location.dart';
 import 'package:costumer/pages/models/get_points_info.dart';
+import 'package:costumer/pages/what_can_we_move.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:get/route_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/poins_cards.dart';
 import 'home.dart';
 
 class Mapi extends StatefulWidget {
@@ -32,7 +34,7 @@ class _MapiState extends State<Mapi> {
   List<dynamic> fullAdress = [];
   @override
   void initState() {
-    getlocation().then((value) {
+    getlocation(context).then((value) {
       if (value.latitude != null) {
         setState(() {
           initialPosition = LatLng(value.latitude, value.longitude);
@@ -50,53 +52,55 @@ class _MapiState extends State<Mapi> {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
+    var screenHight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(right: screenWidth / 6),
-        child: FloatingActionButton.extended(
-          // extendedIconLabelSpacing:100.0,
-          onPressed: () {
-            if (Provider.of<VehicleTypeController>(context, listen: false)
-                .dropPoint
-                .isNotEmpty) {
-              DBProvider.db.addPoint(
-                  Provider.of<VehicleTypeController>(context, listen: false)
-                      .dropPoint);
-            } else {
-              DBProvider.db.addPoint(
-                  Provider.of<VehicleTypeController>(context, listen: false)
-                      .firstPoint);
-            }
-            if (Provider.of<VehicleTypeController>(context, listen: false)
-                .dropPoint
-                .isEmpty) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => Mapi(1, widget.info)),
-                (Route<dynamic> route) => false,
-              );
-            } else {
-              Get.to(() => Home(widget.info));
-            }
-          },
-          label: SizedBox(
-              width: screenWidth / 2,
-              child: Center(
-                  child: Text(
-                context.watch<VehicleTypeController>().dropPoint.isEmpty
-                    ? context.watch<VehicleTypeController>().la
-                        ? 'الى نقطة النهاية'
-                        : 'End Point'
-                    : context.watch<VehicleTypeController>().la
-                        ? 'الى النقل'
-                        : 'To the trip!',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w900),
-              ))),
-          // icon: const Icon(Icons.delivery_dining),
-        ),
-      ),
+      // floatingActionButton: Padding(
+      //   padding: EdgeInsets.only(right: screenWidth / 6),
+      //   child: FloatingActionButton.extended(
+      //     // extendedIconLabelSpacing:100.0,
+      //     onPressed: () {
+      //       if (Provider.of<VehicleTypeController>(context, listen: false)
+      //           .dropPoint
+      //           .isNotEmpty) {
+      //         DBProvider.db.addPoint(
+      //             Provider.of<VehicleTypeController>(context, listen: false)
+      //                 .dropPoint);
+      //       } else {
+      //         DBProvider.db.addPoint(
+      //             Provider.of<VehicleTypeController>(context, listen: false)
+      //                 .firstPoint);
+      //       }
+      //       if (Provider.of<VehicleTypeController>(context, listen: false)
+      //           .dropPoint
+      //           .isEmpty) {
+      //         Navigator.pushAndRemoveUntil(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => Mapi(1, widget.info)),
+      //           (Route<dynamic> route) => false,
+      //         );
+      //       } else {
+      //         Get.to(() => Home(widget.info));
+      //       }
+      //     },
+      //     label: SizedBox(
+      //         width: screenWidth / 2,
+      //         child: Center(
+      //             child: Text(
+      //           context.watch<VehicleTypeController>().dropPoint.isEmpty
+      //               ? context.watch<VehicleTypeController>().la
+      //                   ? 'الى نقطة النهاية'
+      //                   : 'End Point'
+      //               : context.watch<VehicleTypeController>().la
+      //                   ? 'الى النقل'
+      //                   : 'To the trip!',
+      //           style: const TextStyle(
+      //               color: Colors.white, fontWeight: FontWeight.w900),
+      //         ))),
+      //     // icon: const Icon(Icons.delivery_dining),
+      //   ),
+      // ),
+
       body: Stack(
         children: [
           ///map
@@ -135,7 +139,7 @@ class _MapiState extends State<Mapi> {
                                       .read<VehicleTypeController>()
                                       .setFirstPoint([
                                       fullAdress.isNotEmpty
-                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}, ${fullAdress[4]}'
+                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}'
                                           : '',
                                       position.target.latitude.toString(),
                                       position.target.longitude.toString()
@@ -144,7 +148,7 @@ class _MapiState extends State<Mapi> {
                                       .read<VehicleTypeController>()
                                       .setDropPoint([
                                       fullAdress.isNotEmpty
-                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}, ${fullAdress[4]}'
+                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}'
                                           : '',
                                       position.target.latitude.toString(),
                                       position.target.longitude.toString()
@@ -158,47 +162,124 @@ class _MapiState extends State<Mapi> {
 
           //app widget
 
+          SizedBox(width: screenWidth, child: PointsCard(widget.info)),
+
           Positioned(
-              top: 50,
-              left: 10,
-              child: Visibility(
-                visible: fullAdress.isNotEmpty,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white.withOpacity(.5),
-                    // boxShadow: [
-                    //   BoxShadow(color: Colors.white, spreadRadius: 1),
-                    // ],
-                  ),
-                  width: screenWidth - 20,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                            onTap: () => Get.back(),
-                            child: const Icon(CupertinoIcons.back)),
-                        Expanded(
-                          // flex: 5,
+            bottom: 0,
+            child:
+             Container(
+                width: screenWidth,
+                height: screenHight / 8,
+                color: Colors.white.withOpacity(0.7),
+                child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                          flex: 2,
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: FittedBox(
-                              fit: BoxFit.contain,
-                              child: Text(
-                                 fullAdress.isNotEmpty
-                                          ? '${fullAdress[0]}, ${fullAdress[1]}, ${fullAdress[2]}, ${fullAdress[3]}, ${fullAdress[4]}'
-                                          : ''
-                                // style: Theme.of(context).textTheme.headline6,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ))
+                              padding: const EdgeInsets.all(5.0),
+                              child: RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.0)),
+                                  // textColor: Colors.white,
+                                  color: Colors.white,
+                                  onPressed:()=>Get.to(()=>Home(Provider.of<VehicleTypeController>(context, listen: false).info)),
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Icon(CupertinoIcons.back),
+                                          Text(
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                            ),
+                                            context
+                                                    .watch<
+                                                        VehicleTypeController>()
+                                                    .la
+                                                ? "رجوع"
+                                                : "Back",
+                                          ),
+                                          Container()
+                                        ],
+                                      ),
+                                    ),
+                                  )))),
+                      Expanded(
+                          flex: 2,
+                          child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.0)),
+                                  textColor: Colors.white,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  onPressed: () {
+                                    if (Provider.of<VehicleTypeController>(
+                                            context,
+                                            listen: false)
+                                        .dropPoint
+                                        .isNotEmpty) {
+                                      DBProvider.db.addPoint(
+                                          Provider.of<VehicleTypeController>(
+                                                  context,
+                                                  listen: false)
+                                              .dropPoint);
+                                    } else {
+                                      DBProvider.db.addPoint(
+                                          Provider.of<VehicleTypeController>(
+                                                  context,
+                                                  listen: false)
+                                              .firstPoint);
+                                    }
+                                    if (Provider.of<VehicleTypeController>(
+                                            context,
+                                            listen: false)
+                                        .dropPoint
+                                        .isEmpty) {
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                Mapi(1, widget.info)),
+                                        (Route<dynamic> route) => false,
+                                      );
+                                    } else {
+                                      Get.to(() => const ApplyOrder());
+                                    }
+                                  },
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(),
+                                        Text(
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                          ),
+                                          context
+                                                  .watch<
+                                                      VehicleTypeController>()
+                                                  .la
+                                              ? "التالي"
+                                              : "Next",
+                                        ),
+                                        const Icon(
+                                          CupertinoIcons.forward,
+                                          color: Colors.white,
+                                        )
+                                      ],
+                                    ),
+                                  )))),
+                    ])),
+          
+          )
         ],
       ),
     );

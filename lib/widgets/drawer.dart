@@ -6,12 +6,12 @@ import '../controllers/Vehicle_tybe_controller.dart';
 
 Widget drawer(context, info) {
   return Drawer(
-    width: MediaQuery.of(context).size.width / 3,
+    width: MediaQuery.of(context).size.width ,
     child: Column(
       
       children: [
 
-        Container(
+        SizedBox(
           // color: Colors.blueGrey,
 
           height:  MediaQuery.of(context).size.height / 8,

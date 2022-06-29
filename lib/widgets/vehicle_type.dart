@@ -38,6 +38,9 @@ class _VehicleTypeState extends State<VehicleType> {
               child: GestureDetector(
                 onTap: () {
                   context.read<VehicleTypeController>().setIndex(widget.index!);
+                  context
+                      .read<VehicleTypeController>()
+                      .chosenUpdate(widget.vehicle);
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -57,19 +60,16 @@ class _VehicleTypeState extends State<VehicleType> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      
-                       Padding(
+                      Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: 
-                          GradientIcon(
-                             MdiIcons.tankerTruck,
+                        child: GradientIcon(
+                          MdiIcons.tankerTruck,
                           size: 50,
-                        gradient: LinearGradient(colors: [
-                          Colors.pink.shade700,
-                         Theme.of(context).colorScheme.secondary
-                        ]),
-                      ),
-                    
+                          gradient: LinearGradient(colors: [
+                            Colors.pink.shade700,
+                            Theme.of(context).colorScheme.secondary
+                          ]),
+                        ),
                       ),
                       Flexible(
                         child: ListTile(

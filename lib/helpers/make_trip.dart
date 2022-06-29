@@ -12,13 +12,41 @@ import 'constants.dart';
 Future<bool> makeTrip(context, info, choosenType,comment) async {
   http.Response respons;
 
+
+// print(info['name']);
+// print(info['phone']);
+// print(comment);
+// print(Provider.of<VehicleTypeController>(context, listen: false)
+//               .firstPoint[0]);
+// print(Provider.of<VehicleTypeController>(context, listen: false)
+//         .firstPoint[1]);
+// print(Provider.of<VehicleTypeController>(context, listen: false)
+//          .firstPoint[2]);
+// print(Provider.of<VehicleTypeController>(context, listen: false)
+//           .dropPoint[0]);
+// print(Provider.of<VehicleTypeController>(context, listen: false)
+//           .dropPoint[1]);
+         
+// print(Provider.of<VehicleTypeController>(context, listen: false)
+//           .dropPoint[2]);
+//           print('finalFee');
+// print(  Provider.of<VehicleTypeController>(context, listen: false).finalFee);
+// print('choosenType');
+// print( choosenType['id'].toString());
+// print('distanceData');
+// print(  Provider.of<VehicleTypeController>(context, listen: false)
+//          .distanceData);
+
+
+
+
   try {
     respons = await http.post(Uri.parse('${url}api/orders/add'), headers: {
       "Accept": "application/json",
       'Authorization': 'Bearer ${info['token']}'
     }, body: {
-      'user_name': info['name'],
-      'user_phone': info['phone'],
+      'user_name':Provider.of<VehicleTypeController>(context,listen: false).byer!=''? Provider.of<VehicleTypeController>(context,listen: false).byer:info['name'],
+      'user_phone':Provider.of<VehicleTypeController>(context,listen: false).byerPhone!=''? Provider.of<VehicleTypeController>(context,listen: false).byerPhone: info['phone'],
       'user_comment':comment,
       'start_address':
           Provider.of<VehicleTypeController>(context, listen: false)
@@ -60,4 +88,9 @@ Future<bool> makeTrip(context, info, choosenType,comment) async {
   } catch (e) {
     return false;
   }
+
+
+
+
+  return false;
 }

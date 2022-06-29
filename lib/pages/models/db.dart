@@ -43,6 +43,7 @@ class DBProvider {
 
     return result;
   }
+
   Future getPoints() async {
     final db = await database;
     var result = await db.rawQuery("SELECT * FROM locations  ");
@@ -52,6 +53,7 @@ class DBProvider {
 
     return result;
   }
+
   addMe(Map newPro) async {
     final db = await database;
     db.rawDelete("Delete from info");
@@ -59,7 +61,7 @@ class DBProvider {
         "INSERT Into info (id,name,phone,email,account,token)"
         " VALUES (?,?,?,?,?,?)",
         [
-           newPro['id'],
+          newPro['id'],
           newPro['name'],
           newPro['phone'],
           newPro['email'],
@@ -70,32 +72,26 @@ class DBProvider {
     return raw;
   }
 
- addPoint(List<String> newPoint) async {
+  addPoint(List<String> newPoint) async {
     final db = await database;
 
+    try {
       var result = await db.rawQuery(
-        "SELECT * FROM locations WHERE late LIKE '%${newPoint[1]}%' AND longe LIKE '%${  newPoint[2]}%'  ");
-   if(result.isEmpty){
-
-     await db.rawInsert(
-        "INSERT Into locations (address,late,longe)"
-        " VALUES (?,?,?)",
-        [
-          
-          newPoint[0],
-          newPoint[1],
-          newPoint[2],
-        
-        ]);
-
-   }else{
-    print(result);
-   }
-   
-    
+          "SELECT * FROM locations WHERE late LIKE '%${newPoint[1]}%' AND longe LIKE '%${newPoint[2]}%'  ");
+      if (result.isEmpty) {
+        await db.rawInsert(
+            "INSERT Into locations (address,late,longe)"
+            " VALUES (?,?,?)",
+            [
+              newPoint[0],
+              newPoint[1],
+              newPoint[2],
+            ]);
+      } else {
+        print(result);
+      }
+    } catch (e) {}
 
     // return raw;
   }
-
-
 }

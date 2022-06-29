@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:costumer/controllers/Vehicle_tybe_controller.dart';
 import 'package:costumer/pages/check_page.dart';
+import 'package:costumer/pages/what_can_we_move.dart';
+import 'package:country_code_picker/country_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -26,12 +28,12 @@ void main() {
       )
     ],
     child: GetMaterialApp(
+       localizationsDelegates: [
+        CountryLocalizations.delegate,
+       
+      ],
       debugShowCheckedModeBanner: false,
       theme: _buildShrineTheme(),
-      // theme: ThemeData(
-      //   fontFamily: 'Cairo',
-      //   primarySwatch: Colors.blueGrey,
-      // ),
       home: const CheckPoint(),
     ),
   ));
@@ -79,7 +81,7 @@ TextTheme _buildShrineTextTheme(TextTheme base) {
           letterSpacing: defaultLetterSpacing,
         ),
         button: base.button!.copyWith(
-          fontWeight: FontWeight.w500,
+          // fontWeight: FontWeight.w500,
           fontSize: 14,
           letterSpacing: defaultLetterSpacing,
         ),
