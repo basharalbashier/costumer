@@ -138,7 +138,7 @@ class _SignUpState extends State<SignUp> {
                     Text(
                       context.watch<VehicleTypeController>().la
                           ? 'حساب أعمال '
-                          : 'E-mail',
+                          : 'Business Account',
                     ),
                     Checkbox(
                         value: account,

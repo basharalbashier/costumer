@@ -43,7 +43,7 @@ class _PointsCardState extends State<PointsCard> {
                                           ? context
                                                   .watch<VehicleTypeController>()
                                                   .la
-                                              ? 'موقع البداية'
+                                              ? 'موقع الإستلام'
                                               : 'Pick-up locaction'
                                           : context
                                               .watch<VehicleTypeController>()
@@ -85,7 +85,7 @@ class _PointsCardState extends State<PointsCard> {
                                             ? context
                                                     .watch<VehicleTypeController>()
                                                     .la
-                                                ? 'موقع الانزال'
+                                                ? 'موقع التسليم'
                                                 : 'Drop-off locaction'
                                             : context
                                                 .watch<VehicleTypeController>()

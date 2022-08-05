@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:costumer/helpers/create_me.dart';
 import 'package:costumer/helpers/replace_numbers.dart';
 import 'package:costumer/pages/check_page.dart';
@@ -29,7 +31,6 @@ class _SignUpState extends State<Varify> {
   var phone = TextEditingController();
   bool val = true;
    bool _onEditing = true;
-  String? _code;
   @override
   Widget build(BuildContext context) {
     if (!val) {
@@ -45,8 +46,25 @@ class _SignUpState extends State<Varify> {
         height: MediaQuery.of(context).size.height,
         child: Stack(fit: StackFit.expand,
           children: [
+                Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height+30,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("lib/assets/background.jpeg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.black.withOpacity(0.5)),
+                ),
+              ),
+            ),
+         
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Visibility(
                   visible: !isPhoneFiled,
@@ -56,6 +74,8 @@ class _SignUpState extends State<Varify> {
                     child: 
                     TextField(
                       keyboardType: TextInputType.phone,
+                      cursorColor: Colors.white,
+                      style:  TextStyle(color: Colors.white),
                       controller: phone,
                       decoration: InputDecoration(
                         label: Row(
@@ -63,14 +83,11 @@ class _SignUpState extends State<Varify> {
                               ? MainAxisAlignment.end
                               : MainAxisAlignment.start,
                           children: [
-                            Text(
-                              context.watch<VehicleTypeController>().la
-                                  ? 'رقم الهاتف'
-                                  : 'Mobile Number',
-                            ),
+                         
                           ],
                         ),
                         prefix: CountryCodePicker(
+                          textStyle:  TextStyle(color: Colors.white),
                           onChanged: print,
                           initialSelection: '+966',
                           showCountryOnly: false,
@@ -78,7 +95,7 @@ class _SignUpState extends State<Varify> {
                           alignLeft: false,
                         ),
                         focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(width: 1.0),
+                          borderSide: BorderSide(width: 1.0,color: Colors.white),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -95,22 +112,25 @@ class _SignUpState extends State<Varify> {
 
                 Visibility(
                   visible: isPhoneFiled,
+                  
                   child: VerificationCode(
+                    cursorColor: Colors.white,
                     fullBorder: true,
-            // textStyle: TextStyle(fontSize: 20.0, color: Colors.red[900]),
+            textStyle: TextStyle(fontSize: 20.0, color: Colors.white),
             keyboardType: TextInputType.number,
-            underlineColor: Colors.pink, // If this is null it will use primaryColor: Colors.red from Theme
+            underlineColor:  Theme.of(context)
+                                                .colorScheme
+                                                .secondary, // If this is null it will use primaryColor: Colors.red from Theme
             length: 4,
             // cursorColor: Colors.blue, // If this is null it will default to the ambient
             // clearAll is NOT required, you can delete it
             // takes any widget, so you can implement your design
             clearAll: const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Icon(Icons.redo)
+              child: Icon(Icons.redo,color: Colors.white,)
             ),
             onCompleted: (String value) {
               setState(() {
-                _code = value;
               });
             },
             onEditing: (bool value) {
@@ -124,7 +144,7 @@ class _SignUpState extends State<Varify> {
                 _getActionButtons()
               ],
             ),
-          languageWidget(context, Colors.blueGrey.shade900),
+          languageWidget(context, Colors.white),
 
           // const Center(child: Text('dfa'),)
           ],
@@ -134,58 +154,62 @@ class _SignUpState extends State<Varify> {
   }
 
   Widget _getActionButtons() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width / 1.2,
-      height: MediaQuery.of(context).size.height / 16,
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: RaisedButton(
-              color: Theme.of(context).colorScheme.primary,
-              onPressed: () async {
-              if(isPhoneFiled){
-                setState(() {
-                    val = !val;
-                  });
-                  int check = await checkMe(
-                      context, replaceArabicNumber(phone.text), account);
-
-                  if (check == 0) {
-                    setState(() {
+    return Padding(
+      padding: const EdgeInsets.only(top:18.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width / 1.2,
+        height: MediaQuery.of(context).size.height / 16,
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: RaisedButton(
+                color: Colors.white,
+                onPressed: () async {
+                if(isPhoneFiled){
+                  setState(() {
                       val = !val;
                     });
-                  }
+                    int check = await checkMe(
+                        context, replaceArabicNumber(phone.text), account);
 
-              }else{
-                  if (phone.text.length < 9) {
-                  errono('Enter a valid phone number please !',
-                      "أدخل رقم هاتف  صالح رجاء", context);
-                } else {
-                  setState(() {
-                    isPhoneFiled=!isPhoneFiled;
-                  });
+                    if (check == 0) {
+                      setState(() {
+                        val = !val;
+                      });
+                    }
+
+                }else{
+                    if (phone.text.length < 9) {
+                    errono('Enter a valid phone number please !',
+                        "أدخل رقم هاتف  صالح رجاء", context);
+                  } else {
+                    setState(() {
+                      isPhoneFiled=!isPhoneFiled;
+                    });
+                  }
                 }
-              }
-              },
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0)),
-              child: Center(
-                child: GradientText(
-                  context.watch<VehicleTypeController>().la == false
-                      ? "Confirm"
-                      : "تأكيد",
-                  gradient: const LinearGradient(
-                      colors: [Colors.white, Colors.white]),
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w900),
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                child: Center(
+                  child: Text(
+                    context.watch<VehicleTypeController>().la == false
+                        ? "Confirm"
+                        : "تأكيد",
+   
+                    style:  TextStyle(color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary,
+                        fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
